@@ -9,10 +9,6 @@ var BigNumber = require('../libs/node_modules/bignumber.js');
 
 var precision = new BigNumber("1000000000000000000");
 
-/*
-
- */
-
 contract('Genesis', function(accounts) {
     "use strict";
 
