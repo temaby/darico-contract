@@ -85,7 +85,6 @@ contract('Genesis', function(accounts) {
     });
 
 
-
     it("check token amount calculations", function() {
         let instance;
 
@@ -150,6 +149,7 @@ contract('Genesis', function(accounts) {
         // expected total tokens for 4 period: 1.56735E25
         .then(() => Utils.checkClaimedTokensAmount(instance, emitTokensSince, 0, forthPeriodEnds - emitTokensSince, 720000, totalSupply, "1.620668527441056e+26"))
     });
+
 
     it("test genesis token with claimable token", function() {
         let genesisToken;
@@ -260,6 +260,118 @@ contract('Genesis', function(accounts) {
         .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[4], "1315147523689230"));
     });
 
+
+    it("genesis+daughter token with delegated claim", function() {
+        let genesisToken;
+        let claimableToken;
+
+        let createdAt;
+
+        let emitTokensSince = 1514764800;
+
+        let firstPeriodEnds = 1640995200;
+        let secondPeriodEnds = 1767225600;
+        let thirdPeriodEnds = 1893456000;
+        let forthPeriodEnds = 2082758400;
+
+        return TestGenesis.new(
+            emitTokensSince, false,
+            78000000, 0,
+            "Darico Genesis", "DRX"
+        )
+            .then(function(_instance) {
+                genesisToken = _instance;
+
+                return genesisToken.createdAt.call();
+            })
+            .then(function(result) {
+                createdAt = parseInt(result.valueOf());
+            })
+            .then(function() {
+                return Darico.new(genesisToken.address, new BigNumber(78000000).mul(precision), 18, "Darico", "DCO");
+            })
+            .then(function(_instance) {
+                claimableToken = _instance;
+
+                return genesisToken.setClaimableToken(claimableToken.address);
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(function() {
+                return genesisToken.transfer(accounts[1], new BigNumber(1000));
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[1], new BigNumber(1000).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[1], new BigNumber(0).valueOf()))
+            .then(function() {
+                return genesisToken.addTokenEmission(15, new BigNumber("9.940068493").mul(precision), firstPeriodEnds);
+            })
+            .then(Utils.receiptShouldSucceed)
+
+            .then(function() {
+                return genesisToken.addTokenEmission(15, new BigNumber("4.970034247").mul(precision), secondPeriodEnds);
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(function() {
+                return genesisToken.addTokenEmission(15, new BigNumber("2.485017123").mul(precision), thirdPeriodEnds);
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(function() {
+                return genesisToken.addTokenEmission(15, new BigNumber("1.242508562").mul(precision), forthPeriodEnds);
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(function() {
+                return genesisToken.testDelegatedClaim(accounts[1], emitTokensSince + 3600, {from: accounts[5]});
+            })
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[1], new BigNumber(1000).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[1], "30584826132307692"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[2], "0"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[3], "0"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[4], "0"))
+            .then(function() {
+                return genesisToken.testTransfer(emitTokensSince + 7200, accounts[2], new BigNumber(500), {from: accounts[1]});
+            })
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[1], new BigNumber(500).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[2], new BigNumber(500).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[1], "61169652264615384"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[2], "0"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[3], "0"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[4], "0"))
+            .then(function() {
+                return genesisToken.testTransfer(emitTokensSince + 10800, accounts[3], new BigNumber(150), {from: accounts[2]});
+            })
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[1], new BigNumber(500).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[2], new BigNumber(350).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[3], new BigNumber(150).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[1], "61169652264615384"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[2], "15292413066153846"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[3], "0"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[4], "0"))
+            .then(function() {
+                return genesisToken.testTransfer(emitTokensSince + 14400, accounts[4], new BigNumber(43), {from: accounts[3]});
+            })
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[1], new BigNumber(500).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[2], new BigNumber(350).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[3], new BigNumber(107).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[4], new BigNumber(43).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[1], "61169652264615384"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[2], "15292413066153846"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[3], "4587723919846153"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[4], "0"))
+            .then(function() {
+                return genesisToken.testTransfer(emitTokensSince + 18000, accounts[2], new BigNumber(18), {from: accounts[4]});
+            })
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[1], new BigNumber(500).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[2], new BigNumber(368).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[3], new BigNumber(107).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[4], new BigNumber(25).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[1], "61169652264615384"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[2], "36701791358769230"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[3], "4587723919846153"))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[4], "1315147523689230"));
+    });
+
+
+
     it("Can't approve or transferFrom", function (){
         let genesis;
         let someSpender = accounts[0];
@@ -288,4 +400,5 @@ contract('Genesis', function(accounts) {
         .then(Utils.receiptShouldSucceed)
         .then(() => Utils.balanceShouldEqualTo(genesis, accounts[7], 0))
     });
+
 });
