@@ -287,7 +287,5 @@ contract('Genesis', function(accounts) {
         .then(() => genesis.transferFrom(accounts[7], accounts[8], 2000))
         .then(Utils.receiptShouldSucceed)
         .then(() => Utils.balanceShouldEqualTo(genesis, accounts[7], 0))
-        
-
     });
 });
