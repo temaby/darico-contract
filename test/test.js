@@ -259,4 +259,35 @@ contract('Genesis', function(accounts) {
         .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[3], "4587723919846153"))
         .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[4], "1315147523689230"));
     });
+
+    it("Can't approve or transferFrom", function (){
+        var genesis;
+        var someSpender = accounts[0];
+        var maxApproved = 10 ^ 4;
+        var emitTokensSince = parseInt(new Date().getTime() / 1000);
+
+
+        return Genesis.new(
+            emitTokensSince, true,
+            60000, 0,
+            "Darico Genesis", "DRX")
+        .then(function(_instance) {
+            genesis = _instance;
+        })
+        //approve function
+        .then(() => genesis.approve.call(someSpender, maxApproved))
+        .then((result) => assert.equal(result.valueOf(), false, "Oops: approval happened"))
+        .then(() => genesis.transferFrom.call(accounts[7], accounts[8], 2000))
+        .then(() => genesis.approve(someSpender, maxApproved))
+        .then(Utils.receiptShouldSucceed)
+
+        //transferFrom
+        .then((result) => assert.equal(result.valueOf(), false, "Oops; TransferFrom returned true"))
+        .then(() => genesis.transferFrom(accounts[7], accounts[8], 2000))
+        .then(Utils.receiptShouldSucceed)
+        .then(() => Utils.balanceShouldEqualTo(genesis, accounts[7], 0))
+        
+        //getting allowance should return 0
+        .then()
+    });
 });

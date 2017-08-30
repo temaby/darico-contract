@@ -35,4 +35,21 @@ contract Genesis is LoggedGenesisToken {
 
         ClaimedTokens(_holder, since, till, tokens);
     }
+
+    /*
+    this function overrides the transferFrom of the basic class and does NOTHING
+    */
+
+    function transferFrom(address _from, address _to, uint256 _value) returns (bool success){
+        //do nothing
+        return false;
+    }
+
+    /*
+    this function overrides the approve of the basic class and does NOTHING
+    */
+    function approve(address _spender, uint256 _value) returns (bool success) {
+        //do nothing
+        return false;
+    }
 }
