@@ -1,21 +1,21 @@
-var Genesis = artifacts.require("./Genesis.sol");
-var TestGenesis = artifacts.require("./test/TestGenesisToken.sol");
-var Darico = artifacts.require("./Darico.sol");
+let Genesis = artifacts.require("./Genesis.sol");
+let TestGenesis = artifacts.require("./test/TestGenesisToken.sol");
+let Darico = artifacts.require("./Darico.sol");
 
 
-var Utils = require("../libs/test/utils");
+let Utils = require("../libs/test/utils");
 
-var BigNumber = require('../libs/node_modules/bignumber.js');
+let BigNumber = require('../libs/node_modules/bignumber.js');
 
-var precision = new BigNumber("1000000000000000000");
+let precision = new BigNumber("1000000000000000000");
 
 contract('Genesis', function(accounts) {
     "use strict";
 
     it("create contract & check emission info", function() {
-        var genesis, darico;
+        let genesis, darico;
 
-        var emitTokensSince = parseInt(new Date().getTime() / 1000);
+        let emitTokensSince = parseInt(new Date().getTime() / 1000);
 
         return Genesis.new(
                 emitTokensSince, true,
@@ -87,16 +87,16 @@ contract('Genesis', function(accounts) {
 
 
     it("check token amount calculations", function() {
-        var instance;
+        let instance;
 
-        var totalSupply = 720000;
+        let totalSupply = 720000;
 
-        var emitTokensSince = 1514764800;
+        let emitTokensSince = 1514764800;
 
-        var firstPeriodEnds = 1640995200;
-        var secondPeriodEnds = 1767225600;
-        var thirdPeriodEnds = 1893456000;
-        var forthPeriodEnds = 2082758400;
+        let firstPeriodEnds = 1640995200;
+        let secondPeriodEnds = 1767225600;
+        let thirdPeriodEnds = 1893456000;
+        let forthPeriodEnds = 2082758400;
 
         return Genesis.new(
                 emitTokensSince, false,
@@ -152,17 +152,17 @@ contract('Genesis', function(accounts) {
     });
 
     it("test genesis token with claimable token", function() {
-        var genesisToken;
-        var claimableToken;
+        let genesisToken;
+        let claimableToken;
 
-        var createdAt;
+        let createdAt;
 
-        var emitTokensSince = 1514764800;
+        let emitTokensSince = 1514764800;
 
-        var firstPeriodEnds = 1640995200;
-        var secondPeriodEnds = 1767225600;
-        var thirdPeriodEnds = 1893456000;
-        var forthPeriodEnds = 2082758400;
+        let firstPeriodEnds = 1640995200;
+        let secondPeriodEnds = 1767225600;
+        let thirdPeriodEnds = 1893456000;
+        let forthPeriodEnds = 2082758400;
 
         return TestGenesis.new(
             emitTokensSince, false,
@@ -261,10 +261,10 @@ contract('Genesis', function(accounts) {
     });
 
     it("Can't approve or transferFrom", function (){
-        var genesis;
-        var someSpender = accounts[0];
-        var maxApproved = 10 ^ 4;
-        var emitTokensSince = parseInt(new Date().getTime() / 1000);
+        let genesis;
+        let someSpender = accounts[0];
+        let maxApproved = 10 ^ 4;
+        let emitTokensSince = parseInt(new Date().getTime() / 1000);
 
 
         return Genesis.new(
@@ -274,20 +274,20 @@ contract('Genesis', function(accounts) {
         .then(function(_instance) {
             genesis = _instance;
         })
+
         //approve function
         .then(() => genesis.approve.call(someSpender, maxApproved))
         .then((result) => assert.equal(result.valueOf(), false, "Oops: approval happened"))
-        .then(() => genesis.transferFrom.call(accounts[7], accounts[8], 2000))
         .then(() => genesis.approve(someSpender, maxApproved))
         .then(Utils.receiptShouldSucceed)
 
         //transferFrom
+        .then(() => genesis.transferFrom.call(accounts[7], accounts[8], 2000))
         .then((result) => assert.equal(result.valueOf(), false, "Oops; TransferFrom returned true"))
         .then(() => genesis.transferFrom(accounts[7], accounts[8], 2000))
         .then(Utils.receiptShouldSucceed)
         .then(() => Utils.balanceShouldEqualTo(genesis, accounts[7], 0))
         
-        //getting allowance should return 0
-        .then()
+
     });
 });
