@@ -52,4 +52,11 @@ contract Genesis is LoggedGenesisToken {
         //do nothing
         return false;
     }
+
+
+    function mint(address _addr, uint256 _amount) {
+        require(msg.sender == ico);
+        require(_amount >0);
+        // @TODO implement
+    }
 }
