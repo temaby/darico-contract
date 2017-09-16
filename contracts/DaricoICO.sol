@@ -1,10 +1,18 @@
 pragma solidity ^0.4.13;
 
 import "../libs/contracts/PhaseICO.sol";
-import "Genesis.sol";
+import "DaricoGenesis.sol";
 import "Darico.sol";
 import "EthStorage.sol";
 import "../libs/contracts/Bounty.sol";
+
+    /*
+    This contract governs Darico ICO, it communicates with previously deployed Darico and Genesis smart contracts,
+    mostly by calling their `mint` functions.
+
+    NB! DON'T FORGET TO ADD ADDRESS OF THIS CONTRACT AS MINTERS TO DARICO AND GENESIS SMART CONTRACTS
+
+    */
 
 contract DaricoICO is Ownable, MultiVest {
 
@@ -28,7 +36,7 @@ contract DaricoICO is Ownable, MultiVest {
     // Variables
 
     /* This ICO smart contract generates and holds the addresses of DRX and DRC smart contracts */
-    Genesis public drx;
+    DaricoGenesis public drx;
     Darico public drc;
     address public bounty;
     address public team;
@@ -116,8 +124,6 @@ contract DaricoICO is Ownable, MultiVest {
         return (((_eth / 2) + ethersContributed) * _eth * (END_DRCETH - START_DRCETH) / DRC_ETH_MAX_CAP) + _eth * START_DRCETH;
 
     }
-
-
 
     // Modifiers
 

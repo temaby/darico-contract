@@ -1,4 +1,4 @@
-let Genesis = artifacts.require("./Genesis.sol");
+let Genesis = artifacts.require("./DaricoGenesis.sol");
 let TestGenesis = artifacts.require("./test/TestGenesisToken.sol");
 let Darico = artifacts.require("./Darico.sol");
 
@@ -9,7 +9,7 @@ let BigNumber = require('../libs/node_modules/bignumber.js');
 
 let precision = new BigNumber("1000000000000000000");
 
-contract('Genesis', function(accounts) {
+contract('DaricoGenesis', function(accounts) {
     "use strict";
 
     it("create contract & check emission info", function() {
