@@ -2,9 +2,10 @@ pragma solidity ^0.4.13;
 
 import "../libs/contracts/Bounty.sol";
 import "../libs/contracts/Ownable.sol"
+import "../libs/contracts/MintingERC20.sol";
 import "Darico.sol";
 
-contract DaricoBounty is ERC20, Ownable {
+contract DaricoBounty is MintingERC20 {
 
     uint8 constant DRCDAB = 2; // assumed the same decimals as DRC
     uint8 constant DECIMALS = 18;

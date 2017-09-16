@@ -2,7 +2,7 @@ pragma solidity ^0.4.13;
 
 import "../libs/contracts/ERC20.sol";
 import "../libs/contracts/AbstractClaimableToken.sol";
-import "../libs/contracts/Minting.sol";
+import "../libs/contracts/MintingERC20.sol";
 
 contract Darico is ERC20, AbstractClaimableToken, Ownable, Minting {
     uint256 public createdAt;
@@ -44,12 +44,4 @@ contract Darico is ERC20, AbstractClaimableToken, Ownable, Minting {
         bountyToken = _bountyToken;
     }
 
-    function mint(address _addr, uint256 _amount) onlyMinters {
-        require(_amount > 0);
-
-        totalSupply += _amount; // @TODO discuss necessity of loggedERC20;
-        // @TODO @Andrew no totalSupply found in ERC20
-        balances[_addr] += _amount;
-        Transfer(0x0, _addr, _amount);
-    }
 }
