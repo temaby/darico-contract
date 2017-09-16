@@ -36,8 +36,8 @@ contract DaricoICO is Ownable, MultiVest {
     // Variables
 
     /* This ICO smart contract generates and holds the addresses of DRX and DRC smart contracts */
-    DaricoGenesis public drx;
-    Darico public drc;
+    address public drx;
+    address public drc;
     address public bounty;
     address public team;
     adddress public ethStorage;
@@ -47,18 +47,24 @@ contract DaricoICO is Ownable, MultiVest {
     uint256 drxSold;
 
     bool icoOpen = true;
+    bool icoFinished = false;
 
-    function DaricoICO ( address _owner, address _ethStorage, address _bounty, address _team)
-
-    { // @TODO call base constructors
-        bounty = _bounty;
+    function DaricoICO (
+        address _ethStorage,
+        address _bounty,
+        address _team,
+        address _drx,
+        address _drc)
+        // @TODO call base constructors
+    {
         ethStorage = _ethStorage;
+        bounty = _bounty;
         team = _team;
+        drx = _drx;
+        drc = _drc;
 
-        //deploying DRX and DRC tokens
-        drx = new Genesis(msg.sender/* @TODO owner should be team address */, DRC_DECIMALS, DRC_TOTAL_SUPPLY);
-        drc = new Darico(msg.sender/* @TODO owner should be team address */);
-
+        drcSold = Darico(drc).totalSupply;
+        drxSold = DaricoGenesis(drx).totalSupply;
     }
 
     function () payable duringICO nonZero { // @TODO is it better to put duringICO modifier here or in buyFor
@@ -93,9 +99,11 @@ contract DaricoICO is Ownable, MultiVest {
     }
 
     function internalFinishICO() internal {
+        require(false == icoFinished);
         //mint 30% on top for the team
         drc.mint(_team, drcSold * 3 / 10);
         drc.mint(_team, drxSold * 3 / 10);
+        icoFinished = true;
         icoOpen = false;
     }
 
@@ -103,7 +111,7 @@ contract DaricoICO is Ownable, MultiVest {
         icoOpen = true;
     }
 
-    function haltICO() onlyOwner {
+    function pauseICO() onlyOwner {
         icoOpen = false;
     }
 
