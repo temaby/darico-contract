@@ -1,4 +1,4 @@
-let Genesis = artifacts.require("./DaricoGenesis.sol");
+let DaricoGenesis = artifacts.require("./DaricoGenesis.sol");
 let TestGenesis = artifacts.require("./test/TestGenesisToken.sol");
 let Darico = artifacts.require("./Darico.sol");
 
@@ -9,18 +9,20 @@ let BigNumber = require('../libs/node_modules/bignumber.js');
 
 let precision = new BigNumber("1000000000000000000");
 
+
 contract('DaricoGenesis', function(accounts) {
     "use strict";
+
+    // we create Bounty contract first
 
     it("create contract & check emission info", function() {
         let genesis, darico;
 
         let emitTokensSince = parseInt(new Date().getTime() / 1000);
 
-        return Genesis.new(
+        return DaricoGenesis.new(
                 emitTokensSince, true,
-                78000000, 0,
-                "Darico Genesis", "DRX")
+                78000)
         .then(function(_instance) {
             genesis = _instance;
         })
@@ -97,10 +99,8 @@ contract('DaricoGenesis', function(accounts) {
         let thirdPeriodEnds = 1893456000;
         let forthPeriodEnds = 2082758400;
 
-        return Genesis.new(
-                emitTokensSince, false,
-                78000000, 0,
-                "Darico Genesis", "DRX"
+        return DaricoGenesis.new(
+                emitTokensSince, false, 0
             )
         .then(function(_instance) {
             instance = _instance;
@@ -165,9 +165,7 @@ contract('DaricoGenesis', function(accounts) {
         let forthPeriodEnds = 2082758400;
 
         return TestGenesis.new(
-            emitTokensSince, false,
-            78000000, 0,
-            "Darico Genesis", "DRX"
+            emitTokensSince, bool, 0
         )
         .then(function(_instance) {
             genesisToken = _instance;
@@ -275,7 +273,7 @@ contract('DaricoGenesis', function(accounts) {
         let forthPeriodEnds = 2082758400;
 
         return TestGenesis.new(
-            emitTokensSince, false,
+            emitTokensSince, true,
             78000000, 0,
             "Darico Genesis", "DRX"
         )
@@ -370,35 +368,5 @@ contract('DaricoGenesis', function(accounts) {
             .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[4], "1315147523689230"));
     });
 
-
-
-    it("Can't approve or transferFrom", function (){
-        let genesis;
-        let someSpender = accounts[0];
-        let maxApproved = 10 ^ 4;
-        let emitTokensSince = parseInt(new Date().getTime() / 1000);
-
-
-        return Genesis.new(
-            emitTokensSince, true,
-            60000, 0,
-            "Darico Genesis", "DRX")
-        .then(function(_instance) {
-            genesis = _instance;
-        })
-
-        //approve function
-        .then(() => genesis.approve.call(someSpender, maxApproved))
-        .then((result) => assert.equal(result.valueOf(), false, "Oops: approval happened"))
-        .then(() => genesis.approve(someSpender, maxApproved))
-        .then(Utils.receiptShouldSucceed)
-
-        //transferFrom
-        .then(() => genesis.transferFrom.call(accounts[7], accounts[8], 2000))
-        .then((result) => assert.equal(result.valueOf(), false, "Oops; TransferFrom returned true"))
-        .then(() => genesis.transferFrom(accounts[7], accounts[8], 2000))
-        .then(Utils.receiptShouldSucceed)
-        .then(() => Utils.balanceShouldEqualTo(genesis, accounts[7], 0))
-    });
-
 });
+

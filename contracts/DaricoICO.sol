@@ -1,10 +1,9 @@
 pragma solidity ^0.4.13;
 
 import "../libs/contracts/PhaseICO.sol";
-import "DaricoGenesis.sol";
-import "Darico.sol";
-import "EthStorage.sol";
-import "../libs/contracts/Bounty.sol";
+import "./DaricoGenesis.sol";
+import "./Darico.sol";
+import "./DaricoBounty.sol";
 
     /*
     This contract governs Darico ICO, it communicates with previously deployed Darico and Genesis smart contracts,
@@ -14,33 +13,32 @@ import "../libs/contracts/Bounty.sol";
 
     */
 
-contract DaricoICO is Ownable, MultiVest {
+contract DaricoICO is Ownable/*, MultiVest*/ {
 
 
 
     // Constants
 
-    uint256 public constant ICO_SINCE = 1508932800; //Human time (GMT): Wednesday, October 25, 2017 12:00:00 PM
-    uint256 public constant ICO_TILL = 1524657600; //Human time (GMT): Wednesday, April 25, 2018 12:00:00 PM
 
     uint8 public constant ETHDRX = 10; // how many ETH for 1 DRX
 
-    uint8 public constant START_DRCETH = 100; // how many DRC per 1 ETH - start
-    uint8 public constant END_DRCETH = 10; // how many DRC per 1 ETH - end
-    uint8 public constant DRC_DECIMALS = 10 ** 18;
-    uint8 public constant DRX_DECIMALS = 10 ** 0;
+    uint256 public constant DRC_DECIMALS = 10 ** 18;
+    uint256 public constant DRX_DECIMALS = 10 ** 0;
     uint256 public constant DRC_TOTAL_SUPPLY = 240 * 10 ** 6 * DRC_DECIMALS;
     uint256 public constant DRC_SALE_SUPPLY = 60 * 10 ** 6 * DRC_DECIMALS;
-    uint256 public constant DRC_ETH_MAX_CAP = DRC_SALE_SUPPLY * 2 / (START_DRCETH + END_DRCETH); //@TODO recheck
+    uint256 public constant DRX_MAX_SALE_SUPPLY = 60 * 10 ** 3 * DRC_DECIMALS;
+    uint256 public constant DRC_ETH_MAX_CAP = 164232238 * 18 ** 16;
 
     // Variables
 
-    /* This ICO smart contract generates and holds the addresses of DRX and DRC smart contracts */
-    address public drx;
-    address public drc;
-    address public bounty;
+    uint256 public icoSince;
+    uint256 public icoTill;
+
+
+    Darico public drc;
+    DaricoGenesis public drx;
+    DaricoBounty public bounty;
     address public team;
-    adddress public ethStorage;
 
     uint256 ethersContributed;
     uint256 drcSold;
@@ -49,36 +47,53 @@ contract DaricoICO is Ownable, MultiVest {
     bool icoOpen = true;
     bool icoFinished = false;
 
+    struct Phase {
+        uint256 drcEthPrice;
+        uint256 drcVolume;
+    }
+
+    Phase [] phases;
+    uint8 currentPhase;
+
     function DaricoICO (
-        address _ethStorage,
         address _bounty,
         address _team,
         address _drx,
-        address _drc)
+        address _drc,
+        uint256 _icoSince,
+        uint256 _icoTill)
         // @TODO call base constructors
     {
-        ethStorage = _ethStorage;
-        bounty = _bounty;
+        bounty = DaricoBounty(_bounty);
         team = _team;
-        drx = _drx;
-        drc = _drc;
+        drx = DaricoGenesis(_drx);
+        drc = Darico(_drc);
 
-        drcSold = Darico(drc).totalSupply;
-        drxSold = DaricoGenesis(drx).totalSupply;
+        phases.push(Phase(100, 5 * 10 ** 6));
+        phases.push(Phase(85, 10 * 10 ** 6));
+        phases.push(Phase(70, 10 * 10 ** 6));
+        phases.push(Phase(55, 10 * 10 ** 6));
+        phases.push(Phase(40, 10 * 10 ** 6));
+        phases.push(Phase(25, 10 * 10 ** 6));
+        phases.push(Phase(10, 5 * 10 ** 6));
+
+        icoSince = _icoSince;
+        icoTill = _icoTill;
+
     }
+
 
     function () payable duringICO nonZero { // @TODO is it better to put duringICO modifier here or in buyFor
-        internalMintFor(msg.sender);
+        internalMintFor(msg.sender, msg.value);
         ethersContributed += msg.value;
-        contributors[msg.sender] += msg.value;
     }
 
 
-    function internalMintFor(address _addr) internal { // @TODO check if modifier ok for internal function << change to internal if true
+    function internalMintFor(address _addr, uint256 _eth) internal { // @TODO check if modifier ok for internal function << change to internal if true
         uint256 balDRC;
         uint256 balDRX;
 
-        balDRC = calculateDRCAmountForEth(msg.value);
+        balDRC = calculateDRCAmountForEth(_eth); // @TODO is it ok that there is the time between calculation and minting?
         require(balDRC + drcSold <= DRC_SALE_SUPPLY);
         drcSold += balDRC;
         drc.mint(_addr, balDRC);
@@ -94,54 +109,79 @@ contract DaricoICO is Ownable, MultiVest {
         }
     }
 
+
     function finishICO() onlyOwner {
         internalFinishICO();
     }
 
+
     function internalFinishICO() internal {
         require(false == icoFinished);
         //mint 30% on top for the team
-        drc.mint(_team, drcSold * 3 / 10);
-        drc.mint(_team, drxSold * 3 / 10);
+        drc.mint(team, drcSold * 3 / 10); // 60M * 3 / 10 = 6 * 3 = 18 M
+        drc.mint(team, drxSold * 3 / 10); //
         icoFinished = true;
         icoOpen = false;
     }
 
+
     function resumeICO() onlyOwner {
         icoOpen = true;
     }
+
 
     function pauseICO() onlyOwner {
         icoOpen = false;
     }
 
 
-    function calculateDRCAmountForEth(uint256 _eth) {
-        require(END_DRCETH >= START_DRCETH);
-        /*
-                amount of DRC to issue in return for the ETH is calculated as a surface of trapeze with the height being median price and the basis being the ETH contribution
-                |
-                |                xxxxx
-                |             xxxxxxxx
-                |        xxxxixxxxxxxx
-                |    xxxxxxxxixxxxxxxx
-                |    xxxxxxxxixxxxxxxx
-                |    xxxxxxxxixxxxxxxx
-                |    xxxxxxxxixxxxxxxx
-                -------------------------*/
-        return (((_eth / 2) + ethersContributed) * _eth * (END_DRCETH - START_DRCETH) / DRC_ETH_MAX_CAP) + _eth * START_DRCETH;
+    function calculateDRCAmountForEth(uint256 _eth) returns(uint256) {
 
+        uint256 cumulativePhaseVolumes = 0;
+        uint256 ethersLeft = _eth;
+        uint256 drcToSell;
+        uint256 currentPhaseMaxDRCAvailable;
+        for (uint8 i = 0; i < phases.length; i++){
+            // break the cycle if no more contribution left
+            if(0 == ethersLeft){
+                break;
+            }
+            cumulativePhaseVolumes += phases[i].drcVolume;
+
+            // skip all fulfilled phases
+            if(cumulativePhaseVolumes <= drcSold){
+                continue;
+            }
+
+            //calculate how much from the phase is left
+            currentPhaseMaxDRCAvailable = cumulativePhaseVolumes - drcSold;
+            if (currentPhaseMaxDRCAvailable * 1 ether / (phases[i].drcEthPrice * DRC_DECIMALS) > ethersLeft) {
+                //buy for the remaining ETH
+                drcToSell += ethersLeft * phases[i].drcEthPrice;
+                ethersLeft = 0;
+
+            }
+            else {
+                //buy the remaining DRC of current phase and move on to next phase
+                drcToSell += currentPhaseMaxDRCAvailable;
+                ethersLeft -= currentPhaseMaxDRCAvailable / phases[i].drcEthPrice;
+            }
+
+        }
+        return drcToSell;
     }
 
     // Modifiers
 
     modifier duringICO() {
-        require(now >=ICO_SINCE && now <= ICO_TILL);
+        require(now >=icoSince && now <= icoTill);
         require(true == icoOpen);
+        _;
     }
 
 
     modifier nonZero() {
         require (msg.value > 0);
+        _;
     }
 }

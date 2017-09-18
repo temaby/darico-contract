@@ -1,47 +1,29 @@
 pragma solidity ^0.4.13;
 
-import "../libs/contracts/ERC20.sol";
-import "../libs/contracts/AbstractClaimableToken.sol";
 import "../libs/contracts/MintingERC20.sol";
 
-contract Darico is ERC20, AbstractClaimableToken, Ownable, Minting {
-    uint256 public createdAt;
-    address public genesisToken;
-    address public bountyToken;
-    DaricoICO ico;
+contract Darico is MintingERC20 {
 
-    function Darico(address _genesisToken,
-        address _bountyToken,
+    /*// variables
+
+    uint256 public createdAt;
+
+    // functions
+
+    function Darico(
         uint256 _initialSupply,
+        uint256 _maxSupply,
         uint8 _precision,
         string _tokenName,
-        string _symbol)
-        ERC20(_initialSupply, _tokenName, _precision, _symbol, false, false)
+        string _symbol,
+        bool _transferAllSupplyToOwner,
+        bool _locked)
+
+        MintingERC20(_initialSupply, _maxSupply, _tokenName, _precision, _symbol, _transferAllSupplyToOwner, _locked)
     {
         standard = "Darico Standard 0.1";
 
         createdAt = now;
-
-        genesisToken = _genesisToken;
         bountyToken = _bountyToken;
-    }
-
-    function claimedTokens(address _holder, uint256 tokens) {
-        require(msg.sender == genesisToken);
-
-        uint256 holderBalance = balanceOf(_holder);
-
-        setBalance(_holder, holderBalance + tokens);
-
-        Transfer(this, _holder, tokens);
-    }
-
-    function setGenesisToken(address _genesisToken) onlyOwner {
-        genesisToken = _genesisToken;
-    }
-
-    function setBountyToken(address _bountyToken) onlyOwner {
-        bountyToken = _bountyToken;
-    }
-
+    }*/
 }

@@ -1,10 +1,10 @@
 pragma solidity ^0.4.13;
 
-import "../Genesis.sol";
+import "../DaricoGenesis.sol";
 
-contract TestGenesisToken is Genesis {
-    function TestGenesisToken(uint256 emitSince, bool initEmission, uint256 initialSupply, uint8 precision, string tokenName, string tokenSymbol)
-        Genesis(emitSince, initEmission, initialSupply, precision, tokenName, tokenSymbol)
+contract TestGenesisToken is DaricoGenesis {
+    function TestGenesisToken(uint256 emitSince, bool initEmission, uint256 initialSupply)
+        DaricoGenesis(emitSince, initEmission, initialSupply)
     {
 
     }
@@ -12,7 +12,7 @@ contract TestGenesisToken is Genesis {
 
     function testDelegatedClaim(address forAddress, uint256 time) returns (uint256) {
         uint256 currentBalance = balanceOf(forAddress);
-        uint256 currentTotalSupply = totalSupply();
+        uint256 currentTotalSupply = totalSupply;
 
         return claimInternal(time, forAddress, currentBalance, currentTotalSupply);
 
