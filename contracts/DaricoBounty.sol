@@ -1,7 +1,7 @@
 pragma solidity ^0.4.13;
 
-import "../libs/contracts/Bounty.sol";
-import "../libs/contracts/Ownable.sol";
+//import "../libs/contracts/Bounty.sol";
+//import "../libs/contracts/Ownable.sol";
 import "../libs/contracts/MintingERC20.sol";
 import "./Darico.sol";
 
@@ -14,14 +14,14 @@ contract DaricoBounty is MintingERC20 {
     function DaricoBounty (
         Darico _drc,
         uint256 _initialSupply,
-        uint8 _precision,
+        uint256 _maxSupply,
+        uint8 _decimals,
         string _tokenName,
         string _symbol)
-
-        ERC20(_initialSupply, _tokenName, _precision, _symbol, false, false)
+        MintingERC20(_initialSupply, _maxSupply, _tokenName, _decimals, _symbol, false, false)
 
     {
-        drc = _drc;
+        drc = Darico(_drc);
     }
 
     function toDarico() {
@@ -35,6 +35,6 @@ contract DaricoBounty is MintingERC20 {
     }
 
     function setDarico(address _drc) onlyOwner {
-        drc = Darico(_drc);
+        Darico drc =  Darico(_drc);
     }
 }

@@ -4,7 +4,7 @@ import "../libs/contracts/MintingERC20.sol";
 
 contract Darico is MintingERC20 {
 
-    /*// variables
+    // variables
 
     uint256 public createdAt;
 
@@ -24,6 +24,6 @@ contract Darico is MintingERC20 {
         standard = "Darico Standard 0.1";
 
         createdAt = now;
-        bountyToken = _bountyToken;
-    }*/
+//        bountyToken = _bountyToken;
+    }
 }

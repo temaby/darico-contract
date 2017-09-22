@@ -5,11 +5,10 @@ let Darico = artifacts.require("./Darico.sol");
 let DaricoICO = artifacts.require("./DaricoICO.sol");
 let Utils = require("../libs/test/utils");
 
-let BigNumber = require('../libs/node_modules/bignumber.js');
-let drcPrecision =  new BigNumber("1000000000000000000");
+let BigNumber = require('bignumber.js');
+let drcPrecision =  new BigNumber(1000000000000000000);
 
 contract('DaricoICO', function(accounts) {
-    "use strict";
 
     it("create all contracts", function () {
         let team = accounts[1];
@@ -39,18 +38,24 @@ contract('DaricoICO', function(accounts) {
 
             .then(() => {
                 return DaricoBounty.new(
-                    drc, // address _drc,
+                    drc.address, // address _drc,
                     0, // uint256 _initialSupply,
+                    new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
                     18, // uint8 _precision,
                     "Darico Bounty", // string _tokenName,
                     "DARB" // string _symbol
                 )
             })
-            .then(() => drc.mint(accounts[1], 10 * drcPrecision))
+        //     .then(() => {
+        //         // let value = new BigNumber(10).mul(10);
+        //         // console.log(new BigNumber(10).mul(drcPrecision));
+        //         // drc.mint(accounts[1], value);
+        //     })
+            // })
 
-            .then()
-
-            .then();
+            // .then()
+            //
+            // .then();
 
         // @TODO I mints some more DRC
 
