@@ -5,15 +5,18 @@ import "../libs/contracts/AbstractClaimableToken.sol";
 import "../libs/contracts/MintingERC20.sol";
 import "./Darico.sol";
 
+
 contract DaricoGenesis is GenesisToken, MintingERC20 {
 
     // Constants
 
-    uint256 public constant decimals = 0;
-    uint256 public constant maxSupply = 78 * 10 ** 3 * 10 ** decimals;
-    string public constant symbol = "DRX";
-    string public constant name = "Darico Genesis";
+    uint8 public  decimals = 0;
+    uint256 public  maxSupply = 78 * 10 ** 3 * uint(10) ** decimals;
+    string public  symbol = "DRX";
+    string public  name = "Darico Genesis";
 
+    event Debug(string _text, uint256 _value);
+    event DebugAddress(string _text, address _value);
 
     // Variables
 
@@ -29,7 +32,7 @@ contract DaricoGenesis is GenesisToken, MintingERC20 {
         uint256 _initialSupply)
 
     GenesisToken(_initialSupply, decimals, name, symbol, true, false, _emitSince)
-    MintingERC20(_initialSupply, maxSupply, name, decimals, symbol, false, false)
+    MintingERC20(_initialSupply, maxSupply, name, decimals, symbol, true, false)
 
     {
         standard = "Darico Genesis 0.1";
@@ -52,9 +55,10 @@ contract DaricoGenesis is GenesisToken, MintingERC20 {
 
     function tokensClaimedHook(address _holder, uint256 since, uint256 till, uint256 tokens) internal {
         if(address(claimableToken) != 0x0) {
-            Darico(claimableToken).mint(_holder, tokens);
+          if(mint(_holder, tokens) > 0){
+              claimableToken.claimedTokens(_holder, tokens);
+          }
         }
-
         ClaimedTokens(_holder, since, till, tokens);
     }
 }

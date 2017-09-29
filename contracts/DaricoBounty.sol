@@ -35,6 +35,6 @@ contract DaricoBounty is MintingERC20 {
     }
 
     function setDarico(address _drc) onlyOwner {
-        Darico drc =  Darico(_drc);
+        drc =  Darico(_drc);
     }
 }

@@ -11,8 +11,8 @@ let drcPrecision =  new BigNumber(1000000000000000000);
 contract('DaricoICO', function(accounts) {
 
     it("create all contracts", function () {
-        let team = accounts[1];
-        let drx, drc;
+        let team = accounts[0];
+        let drx, drc, ico, bounty;
 
         let emitTokensSince = parseInt(new Date().getTime() / 1000);
 
@@ -28,7 +28,7 @@ contract('DaricoICO', function(accounts) {
             .then(() => {
                 return Darico.new(
                     0x0, // address _bountyToken,
-                    0, // uint256 _initialSupply,
+                    780000, // uint256 _initialSupply,
                     18, // uint8 _precision,
                     "Darico", // string _tokenName,
                     "DRC" // string _symbol
@@ -46,33 +46,35 @@ contract('DaricoICO', function(accounts) {
                     "DARB" // string _symbol
                 )
             })
-        //     .then(() => {
-        //         // let value = new BigNumber(10).mul(10);
-        //         // console.log(new BigNumber(10).mul(drcPrecision));
-        //         // drc.mint(accounts[1], value);
-        //     })
-            // })
-
-            // .then()
-            //
-            // .then();
+            .then((_result) => bounty = _result)
 
         // @TODO I mints some more DRC
 
-        /*    let inTenSeconds = parseInt(new Date().getTime() / 1000 + 10);
-            let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 300);
+
 
             // deploying the ico smart contract
-            let ico = DaricoICO.new(
-                bounty,// address _bounty,
+        .then(() => {
+            let inTenSeconds = parseInt(new Date().getTime() / 1000 + 10);
+            let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 300);
+            return DaricoICO.new(
+                bounty.address,// address _bounty,
                 team, // address _team,
-                drx, // address _drx,
-                drc, // address _drc,
-                drc.totalSupply, // uint256 _drcSoldBefore,
-                drx.totalSupply, // uint256 _drxSoldBefore,
+                drx.address, // address _drx,
+                drc.address, // address _drc,
+                // drc.totalSupply, // uint256 _drcSoldBefore,
+                // drx.totalSupply, // uint256 _drxSoldBefore,
                 inTenSeconds, // uint256 _icoSince,
                 inFiveMinutes // uint256 _icoTill
-            );*/
+            );
+        })
+            .then((_result) => ico = _result)
+
+        .then(function() {
+            // return ico.internalMintFor(new BigNumber(1000),{from:accounts[1]});
+        })
+            .then(Utils.receiptShouldSucceed)
+            // .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[1], new BigNumber(1000).valueOf()))
+            // .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[1], new BigNumber(0).valueOf()))
 
         // @TODO set ICO as minter of DRC and DRX
 

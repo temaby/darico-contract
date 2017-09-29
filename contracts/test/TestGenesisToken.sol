@@ -3,6 +3,9 @@ pragma solidity ^0.4.13;
 import "../DaricoGenesis.sol";
 
 contract TestGenesisToken is DaricoGenesis {
+
+    event Debug(string _text, uint256 _value);
+
     function TestGenesisToken(uint256 emitSince, bool initEmission, uint256 initialSupply)
         DaricoGenesis(emitSince, initEmission, initialSupply)
     {
@@ -12,7 +15,9 @@ contract TestGenesisToken is DaricoGenesis {
 
     function testDelegatedClaim(address forAddress, uint256 time) returns (uint256) {
         uint256 currentBalance = balanceOf(forAddress);
-        uint256 currentTotalSupply = totalSupply;
+        uint256 currentTotalSupply = totalSupply();
+//        Debug('currentBalance',currentBalance);
+//        Debug('currentTotalSupply',currentTotalSupply);
 
         return claimInternal(time, forAddress, currentBalance, currentTotalSupply);
 

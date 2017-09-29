@@ -84,29 +84,30 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
 
 
     function () payable duringICO nonZero { // @TODO is it better to put duringICO modifier here or in buyFor
-        internalMintFor(msg.sender, msg.value);
+        bool status = internalMintFor(msg.sender, msg.value);
+        require(status == true);
         ethersContributed += msg.value;
     }
 
 
-    function internalMintFor(address _addr, uint256 _eth) internal { // @TODO check if modifier ok for internal function << change to internal if true
-        uint256 balDRC;
-        uint256 balDRX;
-
-        balDRC = calculateDRCAmountForEth(_eth); // @TODO is it ok that there is the time between calculation and minting?
+    function internalMintFor(address _addr, uint256 _eth) internal returns (bool success) { // @TODO check if modifier ok for internal function << change to internal if true
+        uint256 balDRC = calculateDRCAmountForEth(_eth); // @TODO is it ok that there is the time between calculation and minting?
         require(balDRC + drcSold <= DRC_SALE_SUPPLY);
         drcSold += balDRC;
-        drc.mint(_addr, balDRC);
+        uint256 drcMintedAmount = drc.mint(_addr, balDRC);
 
-        balDRX = msg.value * DRX_DECIMALS / (ETHDRX * 1 ether);
+        uint256 balDRX = msg.value * DRX_DECIMALS / (ETHDRX * 1 ether);
         if(balDRX > 0){
             drxSold += balDRX;
             drx.mint(_addr, balDRX);
         }
-
         if (DRC_SALE_SUPPLY == drcSold) {
             internalFinishICO();
         }
+        if(drcMintedAmount > 0){
+            return true;
+        }
+        return false;
     }
 
 
