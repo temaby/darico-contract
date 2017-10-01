@@ -21,15 +21,14 @@ contract DaricoBounty is MintingERC20 {
         MintingERC20(_initialSupply, _maxSupply, _tokenName, _decimals, _symbol, false, false)
 
     {
+        standard = 'DaricoBounty 0.1';
         drc = Darico(_drc);
     }
 
     function toDarico() {
         require(0x0 != address(drc));
 
-        uint256 bal;
-
-        bal = balances[msg.sender];
+        uint256 bal = balances[msg.sender];
         balances[msg.sender] = 0;
         drc.mint(msg.sender, bal * DRCDAB);
     }
