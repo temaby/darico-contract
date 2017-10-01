@@ -150,7 +150,7 @@ contract('DaricoICO', function (accounts) {
                 return Darico.new(
                     0, // uint256 _initialSupply,
                     0x0, // address _bountyToken,
-                    780000, // uint256 _maxSupply,
+                    new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
                     18, // uint8 _precision,
                     "Darico", // string _tokenName,
                     "DRC" // string _symbol
@@ -194,14 +194,27 @@ contract('DaricoICO', function (accounts) {
 
             // .then(Utils.receiptShouldSucceed)
             .then(function () {
-                return ico.buy({from: accounts[1], value: new BigNumber(1000)});
+                return ico.buy({from: accounts[1], value: new BigNumber(1).mul(drcPrecision)});
             })
             .then(Utils.receiptShouldSucceed)
             // first phase price  100
-            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(100000).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(100).mul(drcPrecision).valueOf()))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[0], new BigNumber(0).valueOf()))
             .then(() => drc.totalSupply.call())
-            .then((result) => assert.equal(result.valueOf(), new BigNumber("100000").valueOf(), "total supply is not equal"))
+            .then((result) => assert.equal(result.valueOf(), new BigNumber(100).mul(drcPrecision).valueOf(), "total supply is not equal"))
+            .then(() => drx.totalSupply.call())
+            .then((result) => assert.equal(result.valueOf(), new BigNumber("0").valueOf(), "total supply is not equal"))
+
+            .then(function () {
+                return ico.buy({from: accounts[2], value: new BigNumber(10).mul(drcPrecision)});
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[2], new BigNumber(1000).mul(drcPrecision).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[0], new BigNumber(0).valueOf()))
+            .then(() => drc.totalSupply.call())
+            .then((result) => assert.equal(result.valueOf(), new BigNumber(1100).mul(drcPrecision).valueOf(), "total supply is not equal"))
+            .then(() => drx.totalSupply.call())
+            .then((result) => assert.equal(result.valueOf(), new BigNumber("1").valueOf(), "total supply is not equal"))
 
         // @TODO set ICO as minter of DRC and DRX
 

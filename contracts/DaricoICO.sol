@@ -71,13 +71,13 @@ event Debug(string text, uint256 _val);
         drx = DaricoGenesis(_drx);
         drc = Darico(_drc);
 
-        phases.push(Phase(100, 5 * 10 ** 6));
-        phases.push(Phase(85, 10 * 10 ** 6));
-        phases.push(Phase(70, 10 * 10 ** 6));
-        phases.push(Phase(55, 10 * 10 ** 6));
-        phases.push(Phase(40, 10 * 10 ** 6));
-        phases.push(Phase(25, 10 * 10 ** 6));
-        phases.push(Phase(10, 5 * 10 ** 6));
+        phases.push(Phase(100, 5 * 10 ** 6 * DRC_DECIMALS));
+        phases.push(Phase(85, 10 * 10 ** 6 * DRC_DECIMALS));
+        phases.push(Phase(70, 10 * 10 ** 6 * DRC_DECIMALS));
+        phases.push(Phase(55, 10 * 10 ** 6 * DRC_DECIMALS));
+        phases.push(Phase(40, 10 * 10 ** 6 * DRC_DECIMALS));
+        phases.push(Phase(25, 10 * 10 ** 6 * DRC_DECIMALS));
+        phases.push(Phase(10, 5 * 10 ** 6 * DRC_DECIMALS));
 
         icoSince = _icoSince;
         icoTill = _icoTill;
