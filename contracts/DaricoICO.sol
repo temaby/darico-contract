@@ -54,6 +54,7 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
 
     Phase [] phases;
     uint8 currentPhase;
+event Debug(string text, uint256 _val);
 
     function DaricoICO (
         address _bounty,
@@ -61,7 +62,8 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
         address _drx,
         address _drc,
         uint256 _icoSince,
-        uint256 _icoTill)
+        uint256 _icoTill
+)
         // @TODO call base constructors
     {
         bounty = DaricoBounty(_bounty);
@@ -92,11 +94,12 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
 
     function internalMintFor(address _addr, uint256 _eth) internal returns (bool success) { // @TODO check if modifier ok for internal function << change to internal if true
         uint256 balDRC = calculateDRCAmountForEth(_eth); // @TODO is it ok that there is the time between calculation and minting?
+    Debug('balDRC',balDRC);
         require(balDRC + drcSold <= DRC_SALE_SUPPLY);
         drcSold += balDRC;
         uint256 drcMintedAmount = drc.mint(_addr, balDRC);
 
-        uint256 balDRX = msg.value * DRX_DECIMALS / (ETHDRX * 1 ether);
+        uint256 balDRX = _eth * DRX_DECIMALS / (ETHDRX * 1 ether);
         if(balDRX > 0){
             drxSold += balDRX;
             drx.mint(_addr, balDRX);
@@ -140,7 +143,7 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
 
         uint256 cumulativePhaseVolumes = 0;
         uint256 ethersLeft = _eth;
-        uint256 drcToSell;
+        uint256 drcToSell = 0;
         uint256 currentPhaseMaxDRCAvailable;
         for (uint8 i = 0; i < phases.length; i++){
             // break the cycle if no more contribution left
