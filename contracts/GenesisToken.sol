@@ -1,6 +1,6 @@
 pragma solidity ^0.4.13;
 
-import '../libs/contracts/ERC20.sol';
+import './ERC20.sol';
 
 contract GenesisToken is ERC20 {
     uint256 public emitTokensSince;

@@ -1,8 +1,8 @@
 pragma solidity ^0.4.13;
 
 
-import "../libs/contracts/MintingERC20.sol";
-import "../libs/contracts/AbstractClaimableToken.sol";
+import "./MintingERC20.sol";
+import "./AbstractClaimableToken.sol";
 
 contract Darico is MintingERC20, AbstractClaimableToken {
 

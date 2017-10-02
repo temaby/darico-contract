@@ -3,9 +3,9 @@ var TestGenesisToken = artifacts.require("./test/TestGenesisToken.sol");
 var TestClaimableToken = artifacts.require("./test/TestClaimableToken.sol");
 
 
-let Utils = require("../libs/test/utils");
+let Utils = require("./utils");
 
-let BigNumber = require('../libs/node_modules/bignumber.js');
+let BigNumber = require('bignumber.js');
 
 
 /*

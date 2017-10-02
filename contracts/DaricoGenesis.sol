@@ -1,8 +1,8 @@
 pragma solidity ^0.4.13;
 
 import "./GenesisToken.sol";
-import "../libs/contracts/AbstractClaimableToken.sol";
-import "../libs/contracts/MintingERC20.sol";
+import "./AbstractClaimableToken.sol";
+import "./MintingERC20.sol";
 import "./Darico.sol";
 
 

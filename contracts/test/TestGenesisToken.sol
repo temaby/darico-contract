@@ -1,7 +1,7 @@
 pragma solidity ^0.4.13;
 
 import "../GenesisToken.sol";
-import "../../libs/contracts/AbstractClaimableToken.sol";
+import "../AbstractClaimableToken.sol";
 
 contract TestGenesisToken is GenesisToken {
     AbstractClaimableToken public claimableToken;

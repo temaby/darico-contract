@@ -4,7 +4,7 @@ let TestGenesis = artifacts.require("./test/TestGenesisToken.sol");
 let TestICO = artifacts.require("./test/DaricoICOTest.sol");
 let Darico = artifacts.require("./Darico.sol");
 let DaricoICO = artifacts.require("./DaricoICO.sol");
-let Utils = require("../libs/test/utils");
+let Utils = require("./utils");
 
 let BigNumber = require('bignumber.js');
 let drcPrecision = new BigNumber(1000000000000000000);
@@ -296,5 +296,8 @@ contract('DaricoICO', function (accounts) {
 
         .then(() => ico.testDRCAmount.call(new BigNumber(55000000).mul(drcPrecision).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
         .then((result) => assert.equal(result.valueOf(), new BigNumber(10).mul(drcPrecision).valueOf(), "amount is not equal"))
+
+        then(() => ico.testDRCAmount.call(new BigNumber(49000000).mul(drcPrecision).valueOf(),new BigNumber(1000001).mul(drcPrecision).valueOf()))
+        .then((result) => assert.equal(result.valueOf(), new BigNumber(25000010).mul(drcPrecision).valueOf(), "amount is not equal"))
     });
 });

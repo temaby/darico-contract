@@ -1,7 +1,7 @@
 pragma solidity ^0.4.13;
 
 
-import "../libs/contracts/PhaseICO.sol";
+import "./PhaseICO.sol";
 import "./DaricoGenesis.sol";
 import "./Darico.sol";
 import "./DaricoBounty.sol";

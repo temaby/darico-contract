@@ -3,9 +3,9 @@ let TestGenesis = artifacts.require("./test/TestGenesisToken.sol");
 let Darico = artifacts.require("./Darico.sol");
 
 
-let Utils = require("../libs/test/utils");
+let Utils = require("./utils");
 
-let BigNumber = require('../libs/node_modules/bignumber.js');
+let BigNumber = require('bignumber.js');
 
 let precision = new BigNumber("1000000000000000000");
 

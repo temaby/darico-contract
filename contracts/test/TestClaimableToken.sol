@@ -1,7 +1,7 @@
 pragma solidity ^0.4.13;
 
-import "../../libs/contracts/ERC20.sol";
-import "../../libs/contracts/AbstractClaimableToken.sol";
+import "../ERC20.sol";
+import "../AbstractClaimableToken.sol";
 
 contract TestClaimableToken is ERC20, AbstractClaimableToken {
     uint256 public initialSupply;
