@@ -28,4 +28,9 @@ contract DaricoICOTest is DaricoICO {
         require(status == true);
         ethersContributed += msg.value;
     }
+
+    function testDRCAmount(uint256 soldTokens, uint256 _val) returns (uint256){
+        drcSold = soldTokens;
+        return calculateDRCAmountForEth(_val);
+    }
 }
