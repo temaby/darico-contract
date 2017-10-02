@@ -75,6 +75,7 @@ contract('DaricoBounty', function (accounts) {
             .then(() => bounty.toDarico({from:accounts[2]}))
             .then(Utils.receiptShouldSucceed)
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[2], new BigNumber(1).mul(drcPrecision).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(bounty, accounts[2], 0))
 
     });
 });
