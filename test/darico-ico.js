@@ -51,6 +51,7 @@ contract('DaricoICO', function (accounts) {
                 return Darico.new(
                     0, // uint256 _initialSupply,
                     drx.address, // address _genesisToken,
+                    0x0, // address _bountyToken,
                     780000, // uint256 _maxSupply,
                     18, // uint8 _precision,
                     "Darico", // string _tokenName,
@@ -110,7 +111,7 @@ contract('DaricoICO', function (accounts) {
                 let _icoSince = parseInt(new Date().getTime() / 1000 - 200);
                 let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 300);
                 return TestICO.new(
-                    bounty.address,// address _bounty,
+                    // bounty.address,// address _bounty,
                     team, // address _team,
                     drx.address, // address _drx,
                     drc.address, // address _drc,
@@ -121,8 +122,6 @@ contract('DaricoICO', function (accounts) {
                 );
             })
             .then((_result) => ico = _result)
-            .then(() => ico.bounty.call())
-            .then((result) => assert.equal(result.valueOf(), bounty.address, "bounty is not equal"))
             .then(() => ico.team.call())
             .then((result) => assert.equal(result.valueOf(), accounts[5], "team symbol is not equal"))
             .then(() => ico.drx.call())
@@ -149,6 +148,7 @@ contract('DaricoICO', function (accounts) {
             .then(() => {
                 return Darico.new(
                     0, // uint256 _initialSupply,
+                    drx.address, // address _genesisToken,
                     0x0, // address _bountyToken,
                     new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
                     18, // uint8 _precision,
@@ -178,7 +178,7 @@ contract('DaricoICO', function (accounts) {
                 let _icoSince = parseInt(new Date().getTime() / 1000 - 200);
                 let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 300);
                 return TestICO.new(
-                    bounty.address,// address _bounty,
+                    // bounty.address,// address _bounty,
                     team, // address _team,
                     drx.address, // address _drx,
                     drc.address, // address _drc,
@@ -234,6 +234,7 @@ contract('DaricoICO', function (accounts) {
         .then(() => {
             return Darico.new(
                 0, // uint256 _initialSupply,
+                drx.address, // address _genesisToken,
                 0x0, // address _bountyToken,
                 new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
                 18, // uint8 _precision,
@@ -259,7 +260,7 @@ contract('DaricoICO', function (accounts) {
             let _icoSince = parseInt(new Date().getTime() / 1000 - 200);
             let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 300);
             return TestICO.new(
-                bounty.address,// address _bounty,
+                // bounty.address,// address _bounty,
                 team, // address _team,
                 drx.address, // address _drx,
                 drc.address, // address _drc,

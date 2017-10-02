@@ -55,7 +55,9 @@ contract('Genesis', function(accounts) {
             new BigNumber("78000000").mul(precision), 18,
             "TEST", "TST",
             false, false,
-            emitTokensSince)
+            emitTokensSince,
+            new BigNumber("78000000").mul(precision)
+        )
         .then(function(_instance) {
             instance = _instance;
         })
@@ -113,7 +115,9 @@ contract('Genesis', function(accounts) {
             new BigNumber("1720000000000000000000000"), 18,
             "TEST", "TST",
             true, false,
-            emitTokensSince)
+            emitTokensSince,
+            new BigNumber("1720000000000000000000000")
+        )
         .then(function(_instance) {
             instance = _instance;
         })
@@ -146,7 +150,9 @@ contract('Genesis', function(accounts) {
                 new BigNumber("1720000000000000000000000"), 18,
                 "TEST", "TST",
                 true, false,
-                emitTokensSince)
+                emitTokensSince,
+                new BigNumber("1720000000000000000000000")
+        )
             .then(function(_instance) {
                 instance = _instance;
             })
@@ -184,7 +190,9 @@ contract('Genesis', function(accounts) {
             new BigNumber("1720000000000000000000000"), 18,
             "TEST", "TST",
             true, false,
-            emitTokensSince)
+            emitTokensSince,
+            new BigNumber("1720000000000000000000000")
+        )
             .then(function(_instance) {
                 instance = _instance;
             })
@@ -214,7 +222,8 @@ contract('Genesis', function(accounts) {
             new BigNumber("1720000000000000000000000"), 18,
             "TEST", "TST",
             true, false,
-            emitTokensSince)
+            emitTokensSince,
+            new BigNumber("1720000000000000000000000"))
             .then(function(_instance) {
                 instance = _instance;
             })
@@ -249,7 +258,8 @@ contract('Genesis', function(accounts) {
                 720000, 0,
                 "TEST", "TST",
                 true, false,
-                emitTokensSince
+                emitTokensSince,
+                720000
             )
             .then(function(_instance) {
                 instance = _instance;

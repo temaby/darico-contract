@@ -4,7 +4,7 @@ pragma solidity ^0.4.13;
 import "./PhaseICO.sol";
 import "./DaricoGenesis.sol";
 import "./Darico.sol";
-import "./DaricoBounty.sol";
+//import "./DaricoBounty.sol";
 
 
 /*
@@ -21,7 +21,7 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
     // Constants
 
 
-    uint8 public constant ETHDRX = 10; // how many ETH for 1 DRX
+    uint256 public constant ETHDRX = 10 ether; // how many ETH for 1 DRX
 
     uint256 public constant DRC_DECIMALS = 10 ** 18;
 
@@ -33,7 +33,7 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
 
     uint256 public constant DRX_MAX_SALE_SUPPLY = 60 * 10 ** 3 * DRC_DECIMALS;
 
-    uint256 public constant DRC_ETH_MAX_CAP = 164232238 * 18 ** 16;
+    uint256 public constant DRC_ETH_MAX_CAP = 164232238 * 10 ** 16;
 
     // Variables
 
@@ -46,7 +46,7 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
 
     DaricoGenesis public drx;
 
-    DaricoBounty public bounty;
+//    DaricoBounty public bounty;
 
     address public team;
 
@@ -69,10 +69,8 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
 
     uint8 currentPhase;
 
-    event Debug(string text, uint256 _val);
-
     function DaricoICO(
-    address _bounty,
+//    address _bounty,
     address _team,
     address _drx,
     address _drc,
@@ -81,7 +79,7 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
     )
         // @TODO call base constructors
     {
-        bounty = DaricoBounty(_bounty);
+//        bounty = DaricoBounty(_bounty);
         team = _team;
         drx = DaricoGenesis(_drx);
         drc = Darico(_drc);
@@ -113,11 +111,13 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
         require(balDRC + drcSold <= DRC_SALE_SUPPLY);
         drcSold += balDRC;
         uint256 drcMintedAmount = drc.mint(_addr, balDRC);
+        require(drcMintedAmount == balDRC);
 
-        uint256 balDRX = _eth * DRX_DECIMALS / (ETHDRX * 1 ether);
+        uint256 balDRX = _eth * DRX_DECIMALS / ETHDRX;
         if (balDRX > 0) {
             drxSold += balDRX;
-            drx.mint(_addr, balDRX);
+            uint256 drxMintedAmount = drx.mint(_addr, balDRX);
+            require(drxMintedAmount == balDRX);
         }
         if (DRC_SALE_SUPPLY == drcSold) {
             internalFinishICO();
@@ -136,10 +136,13 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
 
     function internalFinishICO() internal {
         require(false == icoFinished);
+        require(now >= icoTill);
         //mint 30% on top for the team
-        drc.mint(team, drcSold * 3 / 10);
+        uint256 drcMintedAmount = drc.mint(team, drcSold * 3 / 10);
+        require(drcMintedAmount == drcSold * 3 / 10);
         // 60M * 3 / 10 = 6 * 3 = 18 M
-        drc.mint(team, drxSold * 3 / 10);
+        uint256 drxMintedAmount = drx.mint(team, drxSold * 3 / 10);
+        require(drxMintedAmount == drcSold * 3 / 10);
         //
         icoFinished = true;
         icoOpen = false;

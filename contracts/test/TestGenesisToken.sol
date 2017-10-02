@@ -8,7 +8,7 @@ contract TestGenesisToken is GenesisToken {
     uint256 public createdAt;
 
     function TestGenesisToken()
-    GenesisToken(5000000 * 10 ** 18, 18, "Test Genesis Token", "TGT", true, false, now)
+    GenesisToken(5000000 * 10 ** 18, 18, "Test Genesis Token", "TGT", true, false, now, 5000000 * 10 ** 18)
     {
         standard = "Test Genesis Token 0.1";
 

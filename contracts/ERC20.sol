@@ -26,7 +26,6 @@ contract ERC20 is Ownable {
 
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint256 value);
-    event ERCDebug (string _string, uint256 _value);
 
 
     modifier onlyPayloadSize(uint numwords) {
@@ -74,8 +73,6 @@ contract ERC20 is Ownable {
         if (value == 0) {
             return true;
         }
-        ERCDebug('balances[_from]',balances[_from]);
-        ERCDebug('value',value);
         if (balances[_from] < value) {
             return false;
         }
@@ -103,7 +100,6 @@ contract ERC20 is Ownable {
 
     function transfer(address _to, uint256 _value) onlyPayloadSize(2) returns (bool) {
         require(locked == false);
-        ERCDebug('transferE',_value);
         bool status = transferInternal(msg.sender, _to, _value);
 
         require(status == true);

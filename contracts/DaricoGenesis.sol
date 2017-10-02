@@ -2,11 +2,10 @@ pragma solidity ^0.4.13;
 
 import "./GenesisToken.sol";
 import "./AbstractClaimableToken.sol";
-import "./MintingERC20.sol";
 import "./Darico.sol";
 
 
-contract DaricoGenesis is GenesisToken, MintingERC20 {
+contract DaricoGenesis is GenesisToken {
 
     // Constants
 
@@ -14,9 +13,6 @@ contract DaricoGenesis is GenesisToken, MintingERC20 {
     uint256 public  maxSupply = 78 * 10 ** 3 * uint(10) ** decimals;
     string public  symbol = "DRX";
     string public  name = "Darico Genesis";
-
-    event Debug(string _text, uint256 _value);
-    event DebugAddress(string _text, address _value);
 
     // Variables
 
@@ -31,9 +27,7 @@ contract DaricoGenesis is GenesisToken, MintingERC20 {
         bool _initEmission,
         uint256 _initialSupply)
 
-    GenesisToken(_initialSupply, decimals, name, symbol, true, false, _emitSince)
-    MintingERC20(_initialSupply, maxSupply, name, decimals, symbol, true, false)
-
+      GenesisToken(_initialSupply, decimals, name, symbol, true, false, _emitSince, maxSupply)
     {
         standard = "Darico Genesis 0.1";
 
@@ -55,7 +49,9 @@ contract DaricoGenesis is GenesisToken, MintingERC20 {
 
     function tokensClaimedHook(address _holder, uint256 since, uint256 till, uint256 tokens) internal {
         if(address(claimableToken) != 0x0) {
-          if(mint(_holder, tokens) > 0){
+            uint256 mintedAmount = mint(_holder, tokens);
+            require(mintedAmount == tokens);
+          if(mintedAmount > 0){
               claimableToken.claimedTokens(_holder, tokens);
           }
         }

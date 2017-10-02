@@ -11,12 +11,14 @@ contract Darico is MintingERC20, AbstractClaimableToken {
     uint256 public createdAt;
 
     address public genesisToken;
+    address public bountyToken;
 
     // functions
 
     function Darico(
     uint256 _initialSupply,
     address _genesisToken,
+    address _bountyToken,
     uint256 _maxSupply,
     uint8 _precision,
     string _tokenName,
@@ -27,6 +29,7 @@ contract Darico is MintingERC20, AbstractClaimableToken {
     {
         standard = "Darico Standard 0.1";
         genesisToken = _genesisToken;
+        bountyToken = _bountyToken;
         createdAt = now;
         //        bountyToken = _bountyToken;
     }
@@ -41,7 +44,17 @@ contract Darico is MintingERC20, AbstractClaimableToken {
         Transfer(this, _holder, tokens);
     }
 
+
+    function claimedBounty(address _holder, uint256 tokens) external{
+        require(msg.sender == bountyToken);
+        uint256 mintedAmount = mint(_holder, tokens);
+        require(mintedAmount == tokens);
+    }
+
     function setGenesisToken(address _genesisToken) onlyOwner {
         genesisToken = _genesisToken;
+    }
+    function setBountyToken(address _bountyToken) onlyOwner {
+        bountyToken = _bountyToken;
     }
 }

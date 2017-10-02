@@ -1,8 +1,8 @@
 pragma solidity ^0.4.13;
 
-import './ERC20.sol';
+import './MintingERC20.sol';
 
-contract GenesisToken is ERC20 {
+contract GenesisToken is MintingERC20 {
     uint256 public emitTokensSince;
 
     TokenEmission[] public emissions;
@@ -27,12 +27,15 @@ contract GenesisToken is ERC20 {
     function GenesisToken(
     uint256 totalSupply,
     uint8 precision,
-    string name, string symbol,
+    string name,
+    string symbol,
     bool transferAllSupplyToOwner,
     bool locked,
-    uint256 _emitTokensSince
+    uint256 _emitTokensSince,
+    uint256 maxSupply
     )
-    ERC20(totalSupply, name, precision, symbol, transferAllSupplyToOwner, locked)
+//    ERC20(totalSupply, name, precision, symbol, transferAllSupplyToOwner, locked)
+    MintingERC20(totalSupply, maxSupply, name, precision, symbol, transferAllSupplyToOwner, locked)
     {
         standard = "GenesisToken 0.1";
 
