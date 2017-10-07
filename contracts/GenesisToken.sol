@@ -146,13 +146,13 @@ contract GenesisToken is MintingERC20 {
     /* this function allows anyone to claim daughter tokens for a specified genesis account;
     no worries, the newly mined tokens will go to genesis holder address
     */
-    function delegatedClaim(address forAddress) returns (uint256) {
+    function delegatedClaim(address _forAddress) returns (uint256) {
         require(false == locked);
 
-        uint256 currentBalance = balanceOf(forAddress);
+        uint256 currentBalance = balanceOf(_forAddress);
         uint256 currentTotalSupply = totalSupply();
 
-        return claimInternal(now, forAddress, currentBalance, currentTotalSupply);
+        return claimInternal(now, _forAddress, currentBalance, currentTotalSupply);
     }
 
 
