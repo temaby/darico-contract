@@ -13,13 +13,15 @@ contract DaricoGenesis is GenesisToken {
     uint256 public  maxSupply = 78 * 10 ** 3 * uint(10) ** decimals;
     string public  symbol = "DRX";
     string public  name = "Darico Genesis";
+    mapping (address => uint256) public beneficiaries;
 
     // Variables
 
     AbstractClaimableToken public claimableToken;
     uint256 public createdAt;
 
-
+    // Events
+    event SetBeneficiary(address _drx, address _newBeneficiary);
     // Functions
 
     function DaricoGenesis(
@@ -47,14 +49,32 @@ contract DaricoGenesis is GenesisToken {
         claimableToken = _token;
     }
 
-    function tokensClaimedHook(address _holder, uint256 since, uint256 till, uint256 tokens) internal {
+    function tokensClaimedHook(address _holder, uint256 _since, uint256 _till, uint256 _tokens) internal {
         if(address(claimableToken) != 0x0) {
-            uint256 mintedAmount = mint(_holder, tokens);
-            require(mintedAmount == tokens);
+            uint256 mintedAmount = claimableToken.mint(_holder, _tokens);
+            require(mintedAmount == _tokens);
           if(mintedAmount > 0){
-              claimableToken.claimedTokens(_holder, tokens);
+              claimableToken.claimedTokens(beneficiaries(_holder), _tokens);
           }
         }
         ClaimedTokens(_holder, since, till, tokens);
     }
+
+    function beneficiaries(address _drxHolder) returns (address){
+        address beneficiary = beneficiaries[_drxHolder];
+
+        if(0x0 == beneficiary) {
+            return msg.sender;
+        } else {
+            return beneficiary;
+        }
+    }
+
+    function setDRCBeneficiary(address _beneficiary) {
+        require(0x0 != _beneficiary);
+        require(balanceOf(msg.sender) > 0);
+        beneficiaries[msg.sender] = _beneficiary;
+        SetBeneficiary(msg.sender, _beneficiary);
+    }
+
 }
