@@ -425,5 +425,9 @@ contract('Genesis', function(accounts) {
             .then(() => checkTotalSupply(instance, createdAt, 86400, new BigNumber(15000000 + 1440).mul(precision)))
             .then(() => checkTotalSupply(instance, createdAt, 150123, "1.500250205e+25"));
     });
+
+    it("DRX holder should be able to set the beneficiary ");
+    it("DRX holder should be the default beneficiary of DRC");
+    it("if beneficiary is reset, the next claim event will make unclaimed coins go to new beneficiary");
 });
 

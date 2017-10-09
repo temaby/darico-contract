@@ -63,7 +63,7 @@ contract DaricoGenesis is GenesisToken {
     function beneficiaries(address _drxHolder) returns (address){
         address beneficiary = beneficiaries[_drxHolder];
 
-        if(0x0 == beneficiary) {
+        if(address(0x0) == beneficiary) {
             return msg.sender;
         } else {
             return beneficiary;
@@ -73,6 +73,11 @@ contract DaricoGenesis is GenesisToken {
     function setDRCBeneficiary(address _beneficiary) {
         require(0x0 != _beneficiary);
         require(balanceOf(msg.sender) > 0);
+
+        // before the beneficiary is changed, claim the currently mined tokens
+        claim();
+
+        // change beneficiary
         beneficiaries[msg.sender] = _beneficiary;
         SetBeneficiary(msg.sender, _beneficiary);
     }
