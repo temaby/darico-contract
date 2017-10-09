@@ -426,8 +426,20 @@ contract('Genesis', function(accounts) {
             .then(() => checkTotalSupply(instance, createdAt, 150123, "1.500250205e+25"));
     });
 
-    it("DRX holder should be able to set the beneficiary ");
-    it("DRX holder should be the default beneficiary of DRC");
-    it("if beneficiary is reset, the next claim event will make unclaimed coins go to new beneficiary");
+    it("DRX holder should be the default beneficiary of DRC", function () {
+        //@TODO here we need to check that te claimable tokens are accrued on DRX holder's address
+    });
+    it("DRX holder should be able to set the beneficiary", function () {
+        // @TODO change the beneficiary here
+    });
+    it("NON DRX holder should not be able to set the beneficiary", function () {
+        // @TODO negative test
+    });
+    it("if beneficiary is reset, all currently mined coins should be claimed and go to previous beneficiary", function () {
+        // @TODO make sure that claimed tokens accrued to old beneficiary, and new tokens start accrued to new beneficiary
+    });
+    it("upon transfer of DRX, DRC tokens have to be claimed, and the new beneficiary becomes the new DRX holder", function () {
+        // @TODO implement test
+    });
 });
 
