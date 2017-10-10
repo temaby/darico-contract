@@ -13,11 +13,11 @@ contract DaricoGenesis is GenesisToken {
     uint256 public  maxSupply = 78 * 10 ** 3 * uint(10) ** decimals;
     string public  symbol = "DRX";
     string public  name = "Darico Genesis";
-    mapping (address => uint256) public beneficiaries;
+    mapping (address => address) public beneficiaries;
 
     // Variables
 
-    AbstractClaimableToken public claimableToken;
+    Darico public claimableToken;
     uint256 public createdAt;
 
     // Events
@@ -45,7 +45,7 @@ contract DaricoGenesis is GenesisToken {
         }
     }
 
-    function setClaimableToken(AbstractClaimableToken _token) onlyOwner {
+    function setClaimableToken(Darico _token) onlyOwner {
         claimableToken = _token;
     }
 
@@ -54,13 +54,13 @@ contract DaricoGenesis is GenesisToken {
             uint256 mintedAmount = claimableToken.mint(_holder, _tokens);
             require(mintedAmount == _tokens);
           if(mintedAmount > 0){
-              claimableToken.claimedTokens(beneficiaries(_holder), _tokens);
+              claimableToken.claimedTokens(getBeneficiary(_holder), _tokens);
           }
         }
-        ClaimedTokens(_holder, since, till, tokens);
+        ClaimedTokens(_holder, _since, _till, _tokens);
     }
 
-    function beneficiaries(address _drxHolder) returns (address){
+    function getBeneficiary(address _drxHolder) returns (address){
         address beneficiary = beneficiaries[_drxHolder];
 
         if(address(0x0) == beneficiary) {
@@ -70,7 +70,7 @@ contract DaricoGenesis is GenesisToken {
         }
     }
 
-    function setDRCBeneficiary(address _beneficiary) {
+    function setBeneficiary(address _beneficiary) {
         require(0x0 != _beneficiary);
         require(balanceOf(msg.sender) > 0);
 
