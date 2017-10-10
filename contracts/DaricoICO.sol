@@ -4,6 +4,8 @@ pragma solidity ^0.4.13;
 import "./PhaseICO.sol";
 import "./DaricoGenesis.sol";
 import "./Darico.sol";
+
+
 //import "./DaricoBounty.sol";
 
 
@@ -46,7 +48,6 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
 
     DaricoGenesis public drx;
 
-//    DaricoBounty public bounty;
 
     address public team;
 
@@ -70,16 +71,13 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
     uint8 currentPhase;
 
     function DaricoICO(
-//    address _bounty,
-    address _team,
-    address _drx,
-    address _drc,
-    uint256 _icoSince,
-    uint256 _icoTill
+        address _team,
+        address _drx,
+        address _drc,
+        uint256 _icoSince,
+        uint256 _icoTill
     )
-        // @TODO call base constructors
     {
-//        bounty = DaricoBounty(_bounty);
         team = _team;
         drx = DaricoGenesis(_drx);
         drc = Darico(_drc);
@@ -130,19 +128,24 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
 
 
     function finishICO() onlyOwner {
+        require(now >= icoTill);
         internalFinishICO();
     }
 
 
     function internalFinishICO() internal {
         require(false == icoFinished);
-        //mint 30% on top for the team
-        uint256 drcMintedAmount = drc.mint(team, drcSold * 3 / 10);
-        require(drcMintedAmount == drcSold * 3 / 10);
+        if ((drcSold * 3 / 10) > 0) {
+            //mint 30% on top for the team
+            uint256 drcMintedAmount = drc.mint(team, drcSold * 3 / 10);
+            require(drcMintedAmount == drcSold * 3 / 10);
+        }
 
-        // 60M * 3 / 10 = 6 * 3 = 18 M
-        uint256 drxMintedAmount = drx.mint(team, drxSold * 3 / 10);
-        require(drxMintedAmount == drcSold * 3 / 10);
+        if ((drxSold * 3 / 10) > 0) {
+            // 60M * 3 / 10 = 6 * 3 = 18 M
+            uint256 drxMintedAmount = drx.mint(team, drxSold * 3 / 10);
+            require(drxMintedAmount == drxSold * 3 / 10);
+        }
         //
         icoFinished = true;
         icoOpen = false;
@@ -179,7 +182,7 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
 
             //calculate how much from the phase is left
             currentPhaseMaxDRCAvailable = cumulativePhaseVolumes - drcSold;
-            if (currentPhaseMaxDRCAvailable * 1 ether / (phases[i].drcEthPrice * DRC_DECIMALS) > ethersLeft) {
+            if (currentPhaseMaxDRCAvailable * DRC_DECIMALS / (phases[i].drcEthPrice * DRC_DECIMALS) > ethersLeft) {
                 //buy for the remaining ETH
                 drcToSell += ethersLeft * phases[i].drcEthPrice;
                 ethersLeft = 0;

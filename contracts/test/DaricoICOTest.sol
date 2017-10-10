@@ -17,7 +17,7 @@ contract DaricoICOTest is DaricoICO {
 
     }
 
-    function buy() payable duringICO nonZero { // @TODO is it better to put duringICO modifier here or in buyFor
+    function buy() payable duringICO nonZero {// @TODO is it better to put duringICO modifier here or in buyFor
         bool status = internalMintFor(msg.sender, msg.value);
         require(status == true);
         ethersContributed += msg.value;
@@ -26,5 +26,10 @@ contract DaricoICOTest is DaricoICO {
     function testDRCAmount(uint256 soldTokens, uint256 _val) returns (uint256){
         drcSold = soldTokens;
         return calculateDRCAmountForEth(_val);
+    }
+
+    function changeICOPeriod(uint256 _icoSince, uint256 _icoTill) onlyOwner{
+        icoSince = _icoSince;
+        icoTill = _icoTill;
     }
 }

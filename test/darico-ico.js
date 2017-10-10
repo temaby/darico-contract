@@ -367,5 +367,184 @@ contract('DaricoICO', function (accounts) {
             })
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed)
+            .then(()=>{
+                let _icoSince = parseInt(new Date().getTime() / 1000 - 200);
+                let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 100);
+                return ico.changeICOPeriod(_icoSince, inFiveMinutes)})
+            .then(Utils.receiptShouldSucceed)
+            .then(()=> ico.sendTransaction({value: new BigNumber(10).mul(drcPrecision)}))
+            .then(Utils.receiptShouldSucceed)
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[0], new BigNumber(1000).mul(drcPrecision)))
+            .then(() => Utils.balanceShouldEqualTo(drx, accounts[0], new BigNumber(1).valueOf()))
+
+            .then(()=>{
+                let _icoSince = parseInt(new Date().getTime() / 1000 +200);
+                let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 1000);
+                return ico.changeICOPeriod(_icoSince, inFiveMinutes)})
+            .then(Utils.receiptShouldSucceed)
+            .then(()=> ico.sendTransaction({value: new BigNumber(10).mul(drcPrecision)}))
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed)
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[0], new BigNumber(1000).mul(drcPrecision)))
+            .then(() => Utils.balanceShouldEqualTo(drx, accounts[0], new BigNumber(1).valueOf()))
+    })
+
+    it("create contracts it  shouldn't be able to buy when ICO is finished", function () {
+        let team = accounts[8];
+        let drx, drc, ico, bounty;
+
+        let emitTokensSince = parseInt(new Date().getTime() / 1000);
+
+        return DaricoGenesis.new(
+            emitTokensSince,    // uint256 emitSince,
+            true, // initGeneration
+            0 // initialSupply
+        )
+            .then((_result) => drx = _result)
+            .then(() => drx.name.call())
+            .then((_result) => assert.equal(_result.valueOf(), "Darico Genesis"))
+
+            .then(() => {
+                return Darico.new(
+                    0, // uint256 _initialSupply,
+                    // drx.address, // address _genesisToken,
+                    new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
+                    18, // uint8 _precision,
+                    "Darico", // string _tokenName,
+                    "DRC" // string _symbol
+                );
+            })
+            .then((_result) => drc = _result)
+
+            .then(() => {
+                return DaricoBounty.new(
+                    drc.address, // address _drc,
+                    0, // uint256 _initialSupply,
+                    new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
+                    18, // uint8 _precision,
+                    "Darico Bounty", // string _tokenName,
+                    "DARB" // string _symbol
+                )
+            })
+            .then((_result) => bounty = _result)
+
+            // @TODO I mints some more DRC
+
+
+            // deploying the ico smart contract
+            .then(() => {
+                let _icoSince = parseInt(new Date().getTime() / 1000 - 200);
+                let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 100);
+                return TestICO.new(
+                    // bounty.address,// address _bounty,
+                    team, // address _team,
+                    drx.address, // address _drx,
+                    drc.address, // address _drc,
+                    _icoSince, // uint256 _icoSince,
+                    inFiveMinutes // uint256 _icoTill
+                );
+            })
+            .then((_result) => ico = _result)
+            .then(() => drx.addMinter(ico.address))
+            .then(() => drc.addMinter(ico.address))
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[8], new BigNumber(0).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(drx, accounts[8], new BigNumber(0).valueOf()))
+            .then(function () {
+                return ico.buy({from: accounts[1], value: new BigNumber(1).mul(drcPrecision)});
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(()=>{
+                let since = parseInt(new Date().getTime() / 1000 -1200);
+                let till = parseInt(new Date().getTime() / 1000 - 1000);
+                return ico.changeICOPeriod(since, till)})
+            .then(()=>ico.finishICO())
+            .then(Utils.receiptShouldSucceed)
+            //1*100000000000000000000 *3/10
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[8], new BigNumber('30000000000000000000').valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(drx, accounts[8], new BigNumber(0).valueOf()))
+            .then(function () {
+                return ico.buy({from: accounts[1], value: new BigNumber(1).mul(drcPrecision)});
+            })
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed)
+    })
+
+    it("create contracts owner should be able to pause and resume ICO", function () {
+        let team = accounts[8];
+        let drx, drc, ico, bounty;
+
+        let emitTokensSince = parseInt(new Date().getTime() / 1000);
+
+        return DaricoGenesis.new(
+            emitTokensSince,    // uint256 emitSince,
+            true, // initGeneration
+            0 // initialSupply
+        )
+            .then((_result) => drx = _result)
+            .then(() => drx.name.call())
+            .then((_result) => assert.equal(_result.valueOf(), "Darico Genesis"))
+
+            .then(() => {
+                return Darico.new(
+                    0, // uint256 _initialSupply,
+                    // drx.address, // address _genesisToken,
+                    new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
+                    18, // uint8 _precision,
+                    "Darico", // string _tokenName,
+                    "DRC" // string _symbol
+                );
+            })
+            .then((_result) => drc = _result)
+
+            .then(() => {
+                return DaricoBounty.new(
+                    drc.address, // address _drc,
+                    0, // uint256 _initialSupply,
+                    new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
+                    18, // uint8 _precision,
+                    "Darico Bounty", // string _tokenName,
+                    "DARB" // string _symbol
+                )
+            })
+            .then((_result) => bounty = _result)
+
+            // @TODO I mints some more DRC
+
+
+            // deploying the ico smart contract
+            .then(() => {
+                let _icoSince = parseInt(new Date().getTime() / 1000 - 200);
+                let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 100);
+                return TestICO.new(
+                    // bounty.address,// address _bounty,
+                    team, // address _team,
+                    drx.address, // address _drx,
+                    drc.address, // address _drc,
+                    _icoSince, // uint256 _icoSince,
+                    inFiveMinutes // uint256 _icoTill
+                );
+            })
+            .then((_result) => ico = _result)
+            .then(() => drx.addMinter(ico.address))
+            .then(() => drc.addMinter(ico.address))
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[8], new BigNumber(0).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(drx, accounts[8], new BigNumber(0).valueOf()))
+            .then(function () {
+                return ico.buy({from: accounts[1], value: new BigNumber(1).mul(drcPrecision)});
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(()=>ico.pauseICO())
+            .then(Utils.receiptShouldSucceed)
+            .then(function () {
+                return ico.buy({from: accounts[1], value: new BigNumber(1).mul(drcPrecision)});
+            })
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed)
+            .then(()=>ico.resumeICO())
+            .then(Utils.receiptShouldSucceed)
+            .then(function () {
+                return ico.buy({from: accounts[1], value: new BigNumber(1).mul(drcPrecision)});
+            })
+            .then(Utils.receiptShouldSucceed)
     })
 });
