@@ -1,6 +1,5 @@
 let DaricoGenesis = artifacts.require("./DaricoGenesis.sol");
 let DaricoBounty = artifacts.require("./DaricoBounty.sol");
-let TestGenesis = artifacts.require("./test/TestGenesisToken.sol");
 let TestICO = artifacts.require("./test/DaricoICOTest.sol");
 let Darico = artifacts.require("./Darico.sol");
 let DaricoICO = artifacts.require("./DaricoICO.sol");
@@ -50,8 +49,6 @@ contract('DaricoICO', function (accounts) {
             .then(() => {
                 return Darico.new(
                     0, // uint256 _initialSupply,
-                    drx.address, // address _genesisToken,
-                    0x0, // address _bountyToken,
                     780000, // uint256 _maxSupply,
                     18, // uint8 _precision,
                     "Darico", // string _tokenName,
@@ -71,8 +68,6 @@ contract('DaricoICO', function (accounts) {
             .then((result) => assert.equal(result.valueOf(), new BigNumber("0").valueOf(), "total supply is not equal"))
             .then(() => drc.locked.call())
             .then((result) => assert.equal(result.valueOf(), false, "locked is not equal"))
-            .then(() => drc.genesisToken.call())
-            .then((result) => assert.equal(result.valueOf(), drx.address, "emitTokensSince is not equal"))
             .then(() => Utils.balanceShouldEqualTo(drc, drc.address, new BigNumber("0").valueOf()))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[0], 0))
 
@@ -115,8 +110,6 @@ contract('DaricoICO', function (accounts) {
                     team, // address _team,
                     drx.address, // address _drx,
                     drc.address, // address _drc,
-                    // drc.totalSupply, // uint256 _drcSoldBefore,
-                    // drx.totalSupply, // uint256 _drxSoldBefore,
                     _icoSince, // uint256 _icoSince,
                     inFiveMinutes // uint256 _icoTill
                 );
@@ -148,8 +141,7 @@ contract('DaricoICO', function (accounts) {
             .then(() => {
                 return Darico.new(
                     0, // uint256 _initialSupply,
-                    drx.address, // address _genesisToken,
-                    0x0, // address _bountyToken,
+                    // drx.address, // address _genesisToken,
                     new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
                     18, // uint8 _precision,
                     "Darico", // string _tokenName,
@@ -234,8 +226,6 @@ contract('DaricoICO', function (accounts) {
         .then(() => {
             return Darico.new(
                 0, // uint256 _initialSupply,
-                drx.address, // address _genesisToken,
-                0x0, // address _bountyToken,
                 new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
                 18, // uint8 _precision,
                 "Darico", // string _tokenName,
@@ -260,12 +250,9 @@ contract('DaricoICO', function (accounts) {
             let _icoSince = parseInt(new Date().getTime() / 1000 - 200);
             let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 300);
             return TestICO.new(
-                // bounty.address,// address _bounty,
                 team, // address _team,
                 drx.address, // address _drx,
                 drc.address, // address _drc,
-                // drc.totalSupply, // uint256 _drcSoldBefore,
-                // drx.totalSupply, // uint256 _drxSoldBefore,
                 _icoSince, // uint256 _icoSince,
                 inFiveMinutes // uint256 _icoTill
             );
@@ -301,4 +288,88 @@ contract('DaricoICO', function (accounts) {
         then(() => ico.testDRCAmount.call(new BigNumber(49000000).mul(drcPrecision).valueOf(),new BigNumber(1000001).mul(drcPrecision).valueOf()))
         .then((result) => assert.equal(result.valueOf(), new BigNumber(25000010).mul(drcPrecision).valueOf(), "amount is not equal"))
     });
+
+    it("create contracts is  shouldn't be able to buy beyond ICO", function () {
+        let team = accounts[0];
+        let drx, drc, ico, bounty;
+
+        let emitTokensSince = parseInt(new Date().getTime() / 1000);
+
+        return DaricoGenesis.new(
+            emitTokensSince,    // uint256 emitSince,
+            true, // initGeneration
+            0 // initialSupply
+        )
+            .then((_result) => drx = _result)
+            .then(() => drx.name.call())
+            .then((_result) => assert.equal(_result.valueOf(), "Darico Genesis"))
+
+            .then(() => {
+                return Darico.new(
+                    0, // uint256 _initialSupply,
+                    // drx.address, // address _genesisToken,
+                    new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
+                    18, // uint8 _precision,
+                    "Darico", // string _tokenName,
+                    "DRC" // string _symbol
+                );
+            })
+            .then((_result) => drc = _result)
+
+            .then(() => {
+                return DaricoBounty.new(
+                    drc.address, // address _drc,
+                    0, // uint256 _initialSupply,
+                    new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
+                    18, // uint8 _precision,
+                    "Darico Bounty", // string _tokenName,
+                    "DARB" // string _symbol
+                )
+            })
+            .then((_result) => bounty = _result)
+
+            // @TODO I mints some more DRC
+
+
+            // deploying the ico smart contract
+            .then(() => {
+                let _icoSince = parseInt(new Date().getTime() / 1000 - 200);
+                let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 300);
+                return TestICO.new(
+                    // bounty.address,// address _bounty,
+                    team, // address _team,
+                    drx.address, // address _drx,
+                    drc.address, // address _drc,
+                    _icoSince, // uint256 _icoSince,
+                    inFiveMinutes // uint256 _icoTill
+                );
+            })
+            .then((_result) => ico = _result)
+            .then(()=>drx.addMinter(ico.address))
+            .then(()=>drc.addMinter(ico.address))
+
+            // .then(Utils.receiptShouldSucceed)
+            .then(function () {
+                return ico.buy({from: accounts[1], value: new BigNumber(1).mul(drcPrecision)});
+            })
+            .then(Utils.receiptShouldSucceed)
+            // first phase price  100
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(100).mul(drcPrecision).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[0], new BigNumber(0).valueOf()))
+            .then(() => drc.totalSupply.call())
+            .then((result) => assert.equal(result.valueOf(), new BigNumber(100).mul(drcPrecision).valueOf(), "total supply is not equal"))
+            .then(() => drx.totalSupply.call())
+            .then((result) => assert.equal(result.valueOf(), new BigNumber("0").valueOf(), "total supply is not equal"))
+
+            .then(function () {
+                return ico.buy({from: accounts[2], value: new BigNumber(10).mul(drcPrecision)});
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[2], new BigNumber(1000).mul(drcPrecision).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[0], new BigNumber(0).valueOf()))
+            .then(() => drc.totalSupply.call())
+            .then((result) => assert.equal(result.valueOf(), new BigNumber(1100).mul(drcPrecision).valueOf(), "total supply is not equal"))
+            .then(() => drx.totalSupply.call())
+            .then((result) => assert.equal(result.valueOf(), new BigNumber("1").valueOf(), "total supply is not equal"))
+    })
 });

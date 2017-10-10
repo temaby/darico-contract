@@ -1,7 +1,5 @@
 pragma solidity ^0.4.13;
 
-//import "../libs/contracts/Bounty.sol";
-//import "../libs/contracts/Ownable.sol";
 import "./MintingERC20.sol";
 import "./Darico.sol";
 
@@ -32,7 +30,8 @@ contract DaricoBounty is MintingERC20 {
         uint256 tokens = bal / DRCDAB;
 
         if (tokens > 0) {
-            drc.claimedBounty(msg.sender, tokens);
+            uint256 mintedAmount = drc.mint(msg.sender, tokens);
+            require(mintedAmount == tokens);
         }
     }
 

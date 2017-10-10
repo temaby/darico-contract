@@ -27,8 +27,7 @@ contract('DaricoBounty', function (accounts) {
             .then(() => {
                 return Darico.new(
                     0, // uint256 _initialSupply,
-                    drx.address, // address _genesisToken,
-                    0x0, // address _bountyToken,
+                    // drx.address, // address _genesisToken,
                     new BigNumber(780000).mul(drcPrecision), // uint256 _maxSupply,
                     18, // uint8 _precision,
                     "Darico", // string _tokenName,
@@ -56,8 +55,6 @@ contract('DaricoBounty', function (accounts) {
                     team, // address _team,
                     drx.address, // address _drx,
                     drc.address, // address _drc,
-                    // drc.totalSupply, // uint256 _drcSoldBefore,
-                    // drx.totalSupply, // uint256 _drxSoldBefore,
                     _icoSince, // uint256 _icoSince,
                     inFiveMinutes // uint256 _icoTill
                 );
@@ -69,7 +66,6 @@ contract('DaricoBounty', function (accounts) {
             .then(() => Utils.balanceShouldEqualTo(bounty, accounts[2], new BigNumber(3).mul(drcPrecision).valueOf()))
             .then(() => bounty.setDarico(drc.address))
             .then(Utils.receiptShouldSucceed)
-            .then(()=>drc.setBountyToken(bounty.address))
             .then(()=>drc.addMinter(bounty.address))
             .then(() => Utils.balanceShouldEqualTo(bounty, accounts[2], new BigNumber(3).mul(drcPrecision).valueOf()))
             .then(() => bounty.toDarico({from:accounts[2]}))

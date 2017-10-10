@@ -136,10 +136,10 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
 
     function internalFinishICO() internal {
         require(false == icoFinished);
-        require(now >= icoTill);
         //mint 30% on top for the team
         uint256 drcMintedAmount = drc.mint(team, drcSold * 3 / 10);
         require(drcMintedAmount == drcSold * 3 / 10);
+
         // 60M * 3 / 10 = 6 * 3 = 18 M
         uint256 drxMintedAmount = drx.mint(team, drxSold * 3 / 10);
         require(drxMintedAmount == drcSold * 3 / 10);
