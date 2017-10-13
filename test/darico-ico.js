@@ -19,7 +19,8 @@ contract('DaricoICO', function (accounts) {
         return DaricoGenesis.new(
             emitTokensSince,    // uint256 emitSince,
             true, // initGeneration
-            0 // initialSupply
+            0, // initialSupply
+            0x0 // drcAddress
         )
             .then((_result) => drx = _result)
             .then(() => drx.name.call())
@@ -132,7 +133,8 @@ contract('DaricoICO', function (accounts) {
         return DaricoGenesis.new(
             emitTokensSince,    // uint256 emitSince,
             true, // initGeneration
-            0 // initialSupply
+            0, // initialSupply
+            0x0 // drcAddress
         )
             .then((_result) => drx = _result)
             .then(() => drx.name.call())
@@ -217,7 +219,8 @@ contract('DaricoICO', function (accounts) {
         return DaricoGenesis.new(
             emitTokensSince,    // uint256 emitSince,
             true, // initGeneration
-            0 // initialSupply
+            0, // initialSupply
+            0x0 // drcAddress
         )
         .then((_result) => drx = _result)
         .then(() => drx.name.call())
@@ -298,7 +301,8 @@ contract('DaricoICO', function (accounts) {
         return DaricoGenesis.new(
             emitTokensSince,    // uint256 emitSince,
             true, // initGeneration
-            0 // initialSupply
+            0, // initialSupply
+            0x0 // drcAddress
         )
             .then((_result) => drx = _result)
             .then(() => drx.name.call())
@@ -398,7 +402,8 @@ contract('DaricoICO', function (accounts) {
         return DaricoGenesis.new(
             emitTokensSince,    // uint256 emitSince,
             true, // initGeneration
-            0 // initialSupply
+            0, // initialSupply
+            0x0 // drcAddress
         )
             .then((_result) => drx = _result)
             .then(() => drx.name.call())
@@ -478,7 +483,8 @@ contract('DaricoICO', function (accounts) {
         return DaricoGenesis.new(
             emitTokensSince,    // uint256 emitSince,
             true, // initGeneration
-            0 // initialSupply
+            0, // initialSupply
+            0x0 // drcAddress
         )
             .then((_result) => drx = _result)
             .then(() => drx.name.call())

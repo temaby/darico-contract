@@ -114,6 +114,7 @@ contract('DaricoGenesis Test Transfering', function (accounts) {
             })
             .then(Utils.receiptShouldSucceed)
             .then(() => Utils.balanceShouldEqualTo(drx, accounts[4], new BigNumber(2)))
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[4], 0))
             .then(function () {
                 return drx.testClaim(emitTokensSince + 65, {from: accounts[1]});
             })
@@ -121,8 +122,15 @@ contract('DaricoGenesis Test Transfering', function (accounts) {
             // ((diff / emission.blockDuration) * emission.blockTokens * currentBalance) / totalSupply;
             // (65/15 * 9940068493000000000 * 3)/5
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], new BigNumber(25844178081800000000)))
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[4], 0))
             .then(function () {
                 return drx.testClaim(emitTokensSince + 65, {from: accounts[4]});
+            })
+            .then(Utils.receiptShouldSucceed)
+            // (15/15 * 9940068493000000000 * 2)/5
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[4], new BigNumber('3976027397200000000').valueOf()))
+            .then(function () {
+                return drx.testClaim(emitTokensSince + 35, {from: accounts[4]});
             })
             .then(Utils.receiptShouldSucceed)
             // (65/15 * 9940068493000000000 * 3)/5
@@ -131,8 +139,8 @@ contract('DaricoGenesis Test Transfering', function (accounts) {
                 return drx.testClaim(emitTokensSince + 35, {from: accounts[4]});
             })
             .then(Utils.receiptShouldSucceed)
-            // (65/15 * 9940068493000000000 * 3)/5
-            .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], new BigNumber(25844178081800000000)))
+            // (65/15 * 9940068493000000000 * 2)/5
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[4], new BigNumber(3976027397200000000).valueOf()))
 
     });
 });

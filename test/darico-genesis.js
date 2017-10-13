@@ -184,7 +184,7 @@ contract('DaricoGenesis', function (accounts) {
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
             .then(function () {
-                return drx.testClaim(createdAt + 15, {from: accounts[1]});
+                return drx.testClaim(emitTokensSince + 15, {from: accounts[1]});
             })
             .then(Utils.receiptShouldSucceed)
             // .then(() => drx.getBeneficiary.call(accounts[1]))
@@ -199,7 +199,7 @@ contract('DaricoGenesis', function (accounts) {
             // .then((result) => console.log('a3?',result.valueOf()))
             .then(() => console.log('a1',accounts[1]))
             .then(function () {
-                return drx.testClaim(createdAt + 35, {from: accounts[1]});
+                return drx.testClaim(emitTokensSince + 35, {from: accounts[1]});
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 9940068493000000000))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1009940068493000000000))
@@ -283,7 +283,7 @@ contract('DaricoGenesis', function (accounts) {
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
             .then(function () {
-                return drx.testClaim(createdAt + 10, {from: accounts[1]});
+                return drx.testClaim(emitTokensSince + 16, {from: accounts[1]});
             })
             .then(Utils.receiptShouldSucceed)
             // .then(() => drx.getBeneficiary.call(accounts[1]))
@@ -377,12 +377,9 @@ contract('DaricoGenesis', function (accounts) {
             // .then((result) => console.log('a3?',result.valueOf()))
             .then(() => console.log('a1',accounts[1]))
             .then(function () {
-                return drx.testClaim(createdAt + 20, {from: accounts[1]});
+                return drx.testClaim(emitTokensSince + 40, {from: accounts[1]});
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 9940068493000000000))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1009940068493000000000))
-    });
-    it("upon transfer of DRX, DRC tokens have to be claimed, and the new beneficiary becomes the new DRX holder", function () {
-        // @TODO implement test
     });
 });
