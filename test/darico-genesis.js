@@ -116,12 +116,8 @@ contract('DaricoGenesis', function (accounts) {
 
     });
     it("DRX holder should be able to set the beneficiary", function () {
-        var instance;
         var drx;
-        var claimableToken;
-
         var createdAt;
-
         team = accounts[8];
         return Darico.new(
             0, // uint256 _initialSupply,
@@ -207,9 +203,6 @@ contract('DaricoGenesis', function (accounts) {
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 9940068493000000000))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1009940068493000000000))
-
-
-
     });
     it("NON DRX holder should not be able to set the beneficiary", function () {
         return createAllContracts(accounts)
@@ -375,6 +368,8 @@ contract('DaricoGenesis', function (accounts) {
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
             // .then(()=> Utils.timeout(15))
+            .then(() => drx.setBeneficiary(accounts[3],{from: accounts[1]}))
+            .then(() => drx.setBeneficiary(accounts[2],{from: accounts[1]}))
             .then(() => drx.setBeneficiary(accounts[3],{from: accounts[1]}))
             .then(Utils.receiptShouldSucceed)
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1009940068493000000000))
