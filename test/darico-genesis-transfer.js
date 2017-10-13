@@ -115,6 +115,9 @@ contract('DaricoGenesis Test Transfering', function (accounts) {
             .then(Utils.receiptShouldSucceed)
             .then(() => Utils.balanceShouldEqualTo(drx, accounts[4], new BigNumber(2)))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[4], 0))
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 5009940068493000000000))
+            // (15/15 * 9940068493000000000 * 5)/5
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 19880136986000000000))
             .then(function () {
                 return drx.testClaim(emitTokensSince + 65, {from: accounts[1]});
             })
