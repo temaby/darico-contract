@@ -363,11 +363,18 @@ contract('DaricoGenesis', function (accounts) {
             })
             .then(function (result) {
                 createdAt = parseInt(result.valueOf());
-                console.log(createdAt);
-                console.log(emitTokensSince);
+                console.log('crea',createdAt);
+                console.log('emit',emitTokensSince);
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
             // .then(()=> Utils.timeout(15))
+            .then(()=>{
+
+            var now = parseInt(new Date().getTime() / 1000);
+            console.log('now',now);
+                Utils.timeout(15 - (now - emitTokensSince)/1000);
+            console.log('after15',parseInt(new Date().getTime() / 1000));
+            })
             .then(() => drx.setBeneficiary(accounts[3],{from: accounts[1]}))
             .then(() => drx.setBeneficiary(accounts[2],{from: accounts[1]}))
             .then(() => drx.setBeneficiary(accounts[3],{from: accounts[1]}))
