@@ -22,9 +22,9 @@ let BigNumber = require('bignumber.js');
  */
 
 function checkClaimedTokensAmount(instance, offsetDate, lastClaimedAt, currentTime, currentBalance, totalSupply, expectedValue) {
-    return instance.calculateEmissionTokens(offsetDate + lastClaimedAt, offsetDate + currentTime, currentBalance, totalSupply)
+    return instance.testCalculateEmissionTokens(offsetDate + lastClaimedAt, offsetDate + currentTime, currentBalance, totalSupply)
         .then(function() {
-            return instance.calculateEmissionTokens.call(offsetDate + lastClaimedAt, offsetDate + currentTime, currentBalance, totalSupply);
+            return instance.testCalculateEmissionTokens.call(offsetDate + lastClaimedAt, offsetDate + currentTime, currentBalance, totalSupply);
         })
         .then(function(result) {
             assert.equal(result.valueOf(), expectedValue.valueOf(), "amount is not equal");
@@ -254,13 +254,16 @@ contract('Genesis', function(accounts) {
         var thirdPeriodEnds = 1893456000;
         var forthPeriodEnds = 2082758400;
 
-        return Genesis.new(
-                720000, 0,
-                "TEST", "TST",
-                true, false,
-                emitTokensSince,
-                720000
-            )
+        // return Genesis.new(
+        //         720000, 0,
+        //         "TEST", "TST",
+        //         true, false,
+        //         emitTokensSince,
+        //         720000
+        //     )
+
+        // GenesisToken(5000000 * 10 ** 18, 18, "Test Genesis Token", "TGT", true, false, now, 5000000 * 10 ** 18)
+        return TestGenesisToken.new()
             .then(function(_instance) {
                 instance = _instance;
             })
@@ -326,6 +329,11 @@ contract('Genesis', function(accounts) {
             .then(function(result) {
                 createdAt = parseInt(result.valueOf());
             })
+            .then(function() {
+                // emissions.push(TokenEmission(60, 10 ** 18, 2**255 - now, false));
+                return genesisToken.addTokenEmission(60, new BigNumber("1").mul(precision), 2**255 - createdAt);
+            })
+            .then(Utils.receiptShouldSucceed)
             .then(function() {
                 return TestClaimableToken.new(genesisToken.address);
             })

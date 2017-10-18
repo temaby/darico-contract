@@ -1,40 +1,36 @@
 pragma solidity ^0.4.13;
 
 
-import "./GenesisToken.sol";
 import "./AbstractClaimableToken.sol";
+import "./GenesisToken.sol";
 import "./Darico.sol";
 
 
 contract DaricoGenesis is GenesisToken {
 
-    // Constants
-
-    uint8 public  decimals = 0;
+    // Variables
 
     uint256 public  maxSupply = 78 * 10 ** 3 * uint(10) ** decimals;
-
-    string public  symbol = "DRX";
+    uint256 public createdAt;
+    uint8 public  decimals = 0;
 
     string public  name = "Darico Genesis";
+    string public  symbol = "DRX";
 
     mapping (address => address) public beneficiaries;
 
-    // Variables
-
     Darico public drc;
 
-    uint256 public createdAt;
 
     // Events
-    event SetBeneficiary(address _drx, address _newBeneficiary);
+    event BeneficiarySet(address _drx, address _newBeneficiary);
     // Functions
 
     function DaricoGenesis(
-    uint256 _emitSince,
-    bool _initEmission,
-    uint256 _initialSupply,
-    address _drc
+        uint256 _emitSince,
+        bool _initEmission,
+        uint256 _initialSupply,
+        address _drc
     )
 
     GenesisToken(_initialSupply, decimals, name, symbol, true, false, _emitSince, maxSupply)
@@ -54,19 +50,11 @@ contract DaricoGenesis is GenesisToken {
         }
     }
 
-    function setDarico(address _tokenAddress) onlyOwner {
+    function setDarico(address _tokenAddress) public onlyOwner {
         drc = Darico(_tokenAddress);
     }
 
-    function tokensClaimedHook(address _holder, uint256 _since, uint256 _till, uint256 _tokens) internal {
-        if (address(drc) != 0x0 && _tokens > 0) {
-            uint256 mintedAmount = drc.mint(getBeneficiary(_holder), _tokens);
-            require(mintedAmount == _tokens);
-        }
-        ClaimedTokens(_holder, _since, _till, _tokens);
-    }
-
-    function getBeneficiary(address _drxHolder) returns (address){
+    function getBeneficiary(address _drxHolder) constant returns (address){
         address beneficiary = beneficiaries[_drxHolder];
 
         if (address(0x0) == beneficiary) {
@@ -77,7 +65,7 @@ contract DaricoGenesis is GenesisToken {
         }
     }
 
-    function setBeneficiary(address _beneficiary) {
+    function setBeneficiary(address _beneficiary) public {
         require(0x0 != _beneficiary);
         require(balanceOf(msg.sender) > 0);
 
@@ -86,7 +74,14 @@ contract DaricoGenesis is GenesisToken {
 
         // change beneficiary
         beneficiaries[msg.sender] = _beneficiary;
-        SetBeneficiary(msg.sender, _beneficiary);
+        BeneficiarySet(msg.sender, _beneficiary);
     }
 
+    function tokensClaimedHook(address _holder, uint256 _since, uint256 _till, uint256 _tokens) internal {
+        if (address(drc) != 0x0 && _tokens > 0) {
+            uint256 mintedAmount = drc.mint(getBeneficiary(_holder), _tokens);
+            require(mintedAmount == _tokens);
+        }
+        ClaimedTokens(_holder, _since, _till, _tokens);
+    }
 }

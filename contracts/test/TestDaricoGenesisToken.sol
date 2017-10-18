@@ -19,13 +19,13 @@ contract TestDaricoGenesisToken is DaricoGenesis {
         emissions.push(TokenEmission(60, 10 ** 18, 2**255 - now, false));
     }
 
-    function testClaim(uint256 time) returns (uint256) {
+    function testClaim(uint256 _time) returns (uint256) {
         uint256 currentBalance = balanceOf(msg.sender);
         uint256 currentTotalSupply = totalSupply();
-        return claimInternal(time, msg.sender, currentBalance, currentTotalSupply);
+        return claimInternal(_time, msg.sender, currentBalance, currentTotalSupply);
     }
 
-    function testTransfer(uint256 time, address _to, uint256 _value) {
-        claimableTransfer(time, _to, _value);
+    function testTransfer(uint256 _time, address _to, uint256 _value) {
+        claimableTransfer(_time, _to, _value);
     }
 }

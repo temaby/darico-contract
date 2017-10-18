@@ -11,21 +11,27 @@ This contract contains basic minting functionality though
 
 contract MintingERC20 is ERC20 {
 
+    //Variables
     mapping (address => bool) public minters;
 
     uint256 public maxSupply;
 
+    //    Modifiers
+    modifier onlyMinters () {
+        require(true == minters[msg.sender]);
+        _;
+    }
+
     function MintingERC20(
-    uint256 _initialSupply,
-    uint256 _maxSupply,
-    string _tokenName,
-    uint8 _decimals,
-    string _symbol,
-    bool _transferAllSupplyToOwner,
-    bool _locked
+        uint256 _initialSupply,
+        uint256 _maxSupply,
+        string _tokenName,
+        uint8 _decimals,
+        string _symbol,
+        bool _transferAllSupplyToOwner,
+        bool _locked
     )
     ERC20(_initialSupply, _tokenName, _decimals, _symbol, _transferAllSupplyToOwner, _locked)
-
     {
         standard = "MintingERC20 0.1";
         minters[msg.sender] = true;
@@ -33,17 +39,17 @@ contract MintingERC20 is ERC20 {
     }
 
 
-    function addMinter(address _newMinter) onlyOwner {
+    function addMinter(address _newMinter) public onlyOwner {
         minters[_newMinter] = true;
     }
 
 
-    function removeMinter(address _minter) onlyOwner {
+    function removeMinter(address _minter) public onlyOwner {
         minters[_minter] = false;
     }
 
 
-    function mint(address _addr, uint256 _amount) onlyMinters returns (uint256) {
+    function mint(address _addr, uint256 _amount) public onlyMinters returns (uint256) {
         if (locked == true) {
             return uint256(0);
         }
@@ -51,9 +57,11 @@ contract MintingERC20 is ERC20 {
         if (_amount == uint256(0)) {
             return uint256(0);
         }
-        if (initialSupply + _amount <= initialSupply){
+
+        if (initialSupply + _amount <= initialSupply) {
             return uint256(0);
         }
+
         if (initialSupply + _amount > maxSupply) {
             return uint256(0);
         }
@@ -61,12 +69,7 @@ contract MintingERC20 is ERC20 {
         initialSupply += _amount;
         balances[_addr] += _amount;
         Transfer(this, _addr, _amount);
+
         return _amount;
-    }
-
-
-    modifier onlyMinters () {
-        require(true == minters[msg.sender]);
-        _;
     }
 }

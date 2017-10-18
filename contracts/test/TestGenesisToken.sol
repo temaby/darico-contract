@@ -14,28 +14,31 @@ contract TestGenesisToken is GenesisToken {
 
         createdAt = now;
 
-        emissions.push(TokenEmission(60, 10 ** 18, 2**255 - now, false));
     }
 
     function setClaimableToken(AbstractClaimableToken _token) onlyOwner {
         claimableToken = _token;
     }
 
-    function tokensClaimedHook(address _holder, uint256 since, uint256 till, uint256 tokens) internal {
-        claimableToken.claimedTokens(_holder, tokens);
+    function tokensClaimedHook(address _holder, uint256 _since, uint256 _till, uint256 _tokens) internal {
+        claimableToken.claimedTokens(_holder, _tokens);
 
-        ClaimedTokens(_holder, since, till, tokens);
+        ClaimedTokens(_holder, _since, _till, _tokens);
     }
 
-    function testClaim(uint256 time) returns (uint256) {
+    function testClaim(uint256 _time) returns (uint256) {
         uint256 currentBalance = balanceOf(msg.sender);
         uint256 currentTotalSupply = totalSupply();
 
-        return claimInternal(time, msg.sender, currentBalance, currentTotalSupply);
+        return claimInternal(_time, msg.sender, currentBalance, currentTotalSupply);
     }
 
-    function testTransfer(uint256 time, address _to, uint256 _value) {
-        claimableTransfer(time, _to, _value);
+    function testTransfer(uint256 _time, address _to, uint256 _value) {
+        claimableTransfer(_time, _to, _value);
+    }
+
+    function testCalculateEmissionTokens(uint256 _lastClaimedAt, uint256 _currentTime, uint256 _currentBalance, uint256 _totalSupply) returns (uint256 tokens){
+        return super.calculateEmissionTokens(_lastClaimedAt, _currentTime, _currentBalance, _totalSupply);
     }
 
     function nonClaimableTransfer(address _to, uint256 _value) {

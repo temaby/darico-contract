@@ -1,12 +1,8 @@
 pragma solidity ^0.4.13;
 
 
-import "./PhaseICO.sol";
 import "./DaricoGenesis.sol";
 import "./Darico.sol";
-
-
-//import "./DaricoBounty.sol";
 
 
 /*
@@ -17,11 +13,10 @@ NB! DON'T FORGET TO ADD ADDRESS OF THIS CONTRACT AS MINTERS TO DARICO AND GENESI
 
 */
 
-contract DaricoICO is Ownable/*, MultiVest*/ {
+contract DaricoICO is Ownable {
 
 
     // Constants
-
 
     uint256 public constant ETHDRX = 10 ether; // how many ETH for 1 DRX
 
@@ -40,35 +35,41 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
     // Variables
 
     uint256 public icoSince;
-
     uint256 public icoTill;
+    uint256 public ethersContributed;
+    uint256 public drcSold;
+    uint256 public drxSold;
+    uint8 public currentPhase;
 
 
     Darico public drc;
-
     DaricoGenesis public drx;
 
 
     address public team;
 
-    uint256 ethersContributed;
-
-    uint256 drcSold;
-
-    uint256 drxSold;
-
-    bool icoOpen = true;
-
-    bool icoFinished = false;
+    bool public icoOpen = true;
+    bool public icoFinished = false;
 
     struct Phase {
-    uint256 drcEthPrice;
-    uint256 drcVolume;
+        uint256 drcEthPrice;
+        uint256 drcVolume;
     }
 
-    Phase [] phases;
+    Phase [] public phases;
 
-    uint8 currentPhase;
+    // Modifiers
+
+    modifier duringICO() {
+        require(now >= icoSince && now <= icoTill);
+        require(true == icoOpen);
+        _;
+    }
+
+    modifier nonZero() {
+        require(msg.value > 0);
+        _;
+    }
 
     function DaricoICO(
         address _team,
@@ -95,13 +96,42 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
 
     }
 
+    function finishICO() public onlyOwner {
+        require(now >= icoTill);
+        internalFinishICO();
+    }
+
+    function internalFinishICO() internal {
+        require(false == icoFinished);
+        if ((drcSold * 3 / 10) > 0) {
+            //mint 30% on top for the team
+            uint256 drcMintedAmount = drc.mint(team, drcSold * 3 / 10);
+            require(drcMintedAmount == drcSold * 3 / 10);
+        }
+
+        if ((drxSold * 3 / 10) > 0) {
+            // 60M * 3 / 10 = 6 * 3 = 18 M
+            uint256 drxMintedAmount = drx.mint(team, drxSold * 3 / 10);
+            require(drxMintedAmount == drxSold * 3 / 10);
+        }
+
+        icoFinished = true;
+        icoOpen = false;
+    }
+
+    function resumeICO() public onlyOwner {
+        icoOpen = true;
+    }
+
+    function pauseICO() public onlyOwner {
+        icoOpen = false;
+    }
 
     function() payable duringICO nonZero {// @TODO is it better to put duringICO modifier here or in buyFor
         bool status = internalMintFor(msg.sender, msg.value);
         require(status == true);
         ethersContributed += msg.value;
     }
-
 
     function internalMintFor(address _addr, uint256 _eth) internal returns (bool success) {// @TODO check if modifier ok for internal function << change to internal if true
         uint256 balDRC = calculateDRCAmountForEth(_eth);
@@ -126,43 +156,7 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
         return false;
     }
 
-
-    function finishICO() onlyOwner {
-        require(now >= icoTill);
-        internalFinishICO();
-    }
-
-
-    function internalFinishICO() internal {
-        require(false == icoFinished);
-        if ((drcSold * 3 / 10) > 0) {
-            //mint 30% on top for the team
-            uint256 drcMintedAmount = drc.mint(team, drcSold * 3 / 10);
-            require(drcMintedAmount == drcSold * 3 / 10);
-        }
-
-        if ((drxSold * 3 / 10) > 0) {
-            // 60M * 3 / 10 = 6 * 3 = 18 M
-            uint256 drxMintedAmount = drx.mint(team, drxSold * 3 / 10);
-            require(drxMintedAmount == drxSold * 3 / 10);
-        }
-        //
-        icoFinished = true;
-        icoOpen = false;
-    }
-
-
-    function resumeICO() onlyOwner {
-        icoOpen = true;
-    }
-
-
-    function pauseICO() onlyOwner {
-        icoOpen = false;
-    }
-
-
-    function calculateDRCAmountForEth(uint256 _eth) returns (uint256) {
+    function calculateDRCAmountForEth(uint256 _eth) internal returns (uint256) {
 
         uint256 cumulativePhaseVolumes = 0;
         uint256 ethersLeft = _eth;
@@ -198,17 +192,5 @@ contract DaricoICO is Ownable/*, MultiVest*/ {
         return drcToSell;
     }
 
-    // Modifiers
 
-    modifier duringICO() {
-        require(now >= icoSince && now <= icoTill);
-        require(true == icoOpen);
-        _;
-    }
-
-
-    modifier nonZero() {
-        require(msg.value > 0);
-        _;
-    }
 }

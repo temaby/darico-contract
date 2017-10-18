@@ -5,9 +5,10 @@ import "./Darico.sol";
 
 contract DaricoBounty is MintingERC20 {
 
-    uint8 constant DRCDAB = 3; // assumed the same decimals as DRC
+    uint8 public constant DRCDAB = 3; // assumed the same decimals as DRC
 
     Darico public drc;
+
     function DaricoBounty (
         address _drc,
         uint256 _initialSupply,
@@ -16,13 +17,12 @@ contract DaricoBounty is MintingERC20 {
         string _tokenName,
         string _symbol)
         MintingERC20(_initialSupply, _maxSupply, _tokenName, _decimals, _symbol, false, false)
-
     {
         standard = 'DaricoBounty 0.1';
         drc = Darico(_drc);
     }
 
-    function toDarico() {
+    function toDarico() public {
         require(0x0 != address(drc));
 
         uint256 bal = balanceOf(msg.sender);
@@ -35,7 +35,7 @@ contract DaricoBounty is MintingERC20 {
         }
     }
 
-    function setDarico(address _drc) onlyOwner {
+    function setDarico(address _drc) public onlyOwner {
         drc =  Darico(_drc);
     }
 }

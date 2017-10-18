@@ -6,22 +6,18 @@ contract tokenRecipient { function receiveApproval(address _from, uint256 _value
 
 contract ERC20 is Ownable {
     /* Public variables of the token */
-    string public standard;
-
-    string public name;
-
-    string public symbol;
-
+    uint256 public initialSupply;
+    uint256 public creationBlock;
     uint8 public decimals;
 
-    uint256 public initialSupply;
+    string public name;
+    string public symbol;
+    string public standard;
 
     bool public locked;
 
-    uint256 public creationBlock;
 
     mapping (address => uint256) public balances;
-
     mapping (address => mapping (address => uint256)) public allowance;
 
     /* This generates a public event on the blockchain that will notify clients */
@@ -29,36 +25,36 @@ contract ERC20 is Ownable {
     event Approval(address indexed _owner, address indexed _spender, uint _value);
 
 
-    modifier onlyPayloadSize(uint numwords) {
-        assert(msg.data.length == numwords * 32 + 4);
+    modifier onlyPayloadSize(uint _numwords) {
+        assert(msg.data.length == _numwords * 32 + 4);
         _;
     }
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function ERC20(
-    uint256 _initialSupply,
-    string tokenName,
-    uint8 decimalUnits,
-    string tokenSymbol,
-    bool transferAllSupplyToOwner,
-    bool _locked
+        uint256 _initialSupply,
+        string _tokenName,
+        uint8 _decimalUnits,
+        string _tokenSymbol,
+        bool _transferAllSupplyToOwner,
+        bool _locked
     ) {
         standard = 'ERC20 0.1';
 
         initialSupply = _initialSupply;
 
-        if (transferAllSupplyToOwner) {
+        if (_transferAllSupplyToOwner) {
             setBalance(msg.sender, initialSupply);
         }
         else {
             setBalance(this, initialSupply);
         }
 
-        name = tokenName;
+        name = _tokenName;
         // Set the name for display purposes
-        symbol = tokenSymbol;
+        symbol = _tokenSymbol;
         // Set the symbol for display purposes
-        decimals = decimalUnits;
+        decimals = _decimalUnits;
         // Amount of decimals for display purposes
         locked = _locked;
         creationBlock = block.number;
@@ -66,41 +62,11 @@ contract ERC20 is Ownable {
 
     /* internal balances */
 
-    function setBalance(address holder, uint256 amount) internal {
-        balances[holder] = amount;
-    }
 
-    function transferInternal(address _from, address _to, uint256 value) internal returns (bool success) {
-        if (value == 0) {
-            Transfer(_from, _to, value);
-            return true;
-        }
-        if (balances[_from] < value) {
-            return false;
-        }
-
-        if (balances[_to] + value <= balances[_to]) {
-            return false;
-        }
-
-        setBalance(_from, balances[_from] - value);
-        setBalance(_to, balances[_to] + value);
-
-        Transfer(_from, _to, value);
-
-        return true;
-    }
 
     /* public methods */
-    function totalSupply() returns (uint256) {
-        return initialSupply;
-    }
 
-    function balanceOf(address _address) returns (uint256) {
-        return balances[_address];
-    }
-
-    function transfer(address _to, uint256 _value) onlyPayloadSize(2) returns (bool) {
+    function transfer(address _to, uint256 _value) onlyPayloadSize(2) public returns (bool) {
         require(locked == false);
         bool status = transferInternal(msg.sender, _to, _value);
 
@@ -109,7 +75,7 @@ contract ERC20 is Ownable {
         return true;
     }
 
-    function approve(address _spender, uint256 _value) returns (bool success) {
+    function approve(address _spender, uint256 _value) public returns (bool success) {
         if(locked) {
             return false;
         }
@@ -120,7 +86,7 @@ contract ERC20 is Ownable {
         return true;
     }
 
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
         if (locked) {
             return false;
         }
@@ -133,7 +99,7 @@ contract ERC20 is Ownable {
         }
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         if (locked) {
             return false;
         }
@@ -149,5 +115,40 @@ contract ERC20 is Ownable {
         }
 
         return _success;
+    }
+
+    /* internal functions*/
+    function setBalance(address _holder, uint256 _amount) internal {
+        balances[_holder] = _amount;
+    }
+
+    function transferInternal(address _from, address _to, uint256 _value) internal returns (bool success) {
+        if (_value == 0) {
+            Transfer(_from, _to, _value);
+            return true;
+        }
+        if (balances[_from] < _value) {
+            return false;
+        }
+
+        if (balances[_to] + _value <= balances[_to]) {
+            return false;
+        }
+
+        setBalance(_from, balances[_from] - _value);
+        setBalance(_to, balances[_to] + _value);
+
+        Transfer(_from, _to, _value);
+
+        return true;
+    }
+
+    /*constant functions*/
+    function totalSupply() constant returns (uint256) {
+        return initialSupply;
+    }
+
+    function balanceOf(address _address) constant returns (uint256) {
+        return balances[_address];
     }
 }

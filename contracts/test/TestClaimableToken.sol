@@ -29,7 +29,7 @@ contract TestClaimableToken is ERC20, AbstractClaimableToken {
         require(status == true);
     }
 
-    function totalSupplyCalculation(uint256 time) returns (uint256) {
+    function totalSupplyCalculation(uint256 time) public returns (uint256) {
         return currentTotalSupply + ((time - lastGeneratedTotalSupply) * 10 ** 18) / 60;
     }
 
@@ -47,7 +47,7 @@ contract TestClaimableToken is ERC20, AbstractClaimableToken {
         return currentTotalSupply;
     }
 
-    function totalSupply() returns (uint256) {
+    function totalSupply() constant returns (uint256) {
         return totalSupplyInternal(now);
     }
 

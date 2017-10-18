@@ -11,13 +11,12 @@ contract Darico is MintingERC20 {
 
     // functions
     function Darico(
-    uint256 _initialSupply,
-    uint256 _maxSupply,
-    uint8 _precision,
-    string _tokenName,
-    string _symbol
+        uint256 _initialSupply,
+        uint256 _maxSupply,
+        uint8 _precision,
+        string _tokenName,
+        string _symbol
     )
-
     MintingERC20(_initialSupply, _maxSupply, _tokenName, _precision, _symbol, true, false)
     {
         standard = "Darico Standard 0.1";

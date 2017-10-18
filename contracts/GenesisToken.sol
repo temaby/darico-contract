@@ -3,68 +3,98 @@ pragma solidity ^0.4.13;
 import './MintingERC20.sol';
 
 contract GenesisToken is MintingERC20 {
+
+    /* variables */
     uint256 public emitTokensSince;
 
     TokenEmission[] public emissions;
 
-    mapping(address => uint256) lastClaims;
+    mapping(address => uint256) internal lastClaims;
 
     /* structs */
 
     struct TokenEmission {
-    uint256 blockDuration;      // duration of block in secs
-    uint256 blockTokens;        // tokens per block
-    uint256 periodEndsAt;     // duration in secs
-    bool removed;
+        uint256 blockDuration;      // duration of block in secs
+        uint256 blockTokens;        // tokens per block
+        uint256 periodEndsAt;     // duration in secs
+        bool removed;
     }
 
     /* events */
 
-    event ClaimedTokens(address _holder, uint256 since, uint256 till, uint256 tokens);
+    event ClaimedTokens(address _holder, uint256 _since, uint256 _till, uint256 _tokens);
 
     /* constructor */
 
     function GenesisToken(
-    uint256 totalSupply,
-    uint8 precision,
-    string name,
-    string symbol,
-    bool transferAllSupplyToOwner,
-    bool locked,
-    uint256 _emitTokensSince,
-    uint256 maxSupply
+        uint256 _totalSupply,
+        uint8 _precision,
+        string _name,
+        string _symbol,
+        bool _transferAllSupplyToOwner,
+        bool _locked,
+        uint256 _emitTokensSince,
+        uint256 _maxSupply
     )
-//    ERC20(totalSupply, name, precision, symbol, transferAllSupplyToOwner, locked)
-    MintingERC20(totalSupply, maxSupply, name, precision, symbol, transferAllSupplyToOwner, locked)
+    MintingERC20(_totalSupply, _maxSupply, _name, _precision, _symbol, _transferAllSupplyToOwner, _locked)
     {
         standard = "GenesisToken 0.1";
-
         emitTokensSince = _emitTokensSince;
     }
 
-    function addTokenEmission(uint256 blockDuration, uint256 blockTokens, uint256 periodEndsAt) onlyOwner {
-        emissions.push(TokenEmission(blockDuration, blockTokens, periodEndsAt, false));
+    function addTokenEmission(uint256 _blockDuration, uint256 _blockTokens, uint256 _periodEndsAt) public onlyOwner {
+        emissions.push(TokenEmission(_blockDuration, _blockTokens, _periodEndsAt, false));
     }
 
-    function removeTokenEmission(uint256 i) onlyOwner {
-        require(i < emissions.length);
+    function removeTokenEmission(uint256 _i) public onlyOwner {
+        require(_i < emissions.length);
 
-        emissions[i].removed = true;
+        emissions[_i].removed = true;
     }
 
-    function updateTokenEmission(uint256 i, uint256 blockDuration, uint256 blockTokens, uint256 periodEndsAt) onlyOwner {
-        require(i < emissions.length);
+    function updateTokenEmission(uint256 _i, uint256 _blockDuration, uint256 _blockTokens, uint256 _periodEndsAt) public onlyOwner {
+        require(_i < emissions.length);
 
-        emissions[i].blockDuration = blockDuration;
-        emissions[i].blockTokens = blockTokens;
-        emissions[i].periodEndsAt = periodEndsAt;
+        emissions[_i].blockDuration = _blockDuration;
+        emissions[_i].blockTokens = _blockTokens;
+        emissions[_i].periodEndsAt = _periodEndsAt;
     }
 
-    function calculateEmissionTokens(uint256 lastClaimedAt, uint256 currentTime, uint256 currentBalance, uint256 totalSupply) returns (uint256 tokens) {
+    /* this function allows anyone to claim daughter tokens for a specified genesis account;
+    no worries, the newly mined tokens will go to genesis holder address
+     created for cold storage tokens
+    */
+//@todo check  for beneficiaries
+    function delegatedClaim(address _forAddress) public returns (uint256) {
+        require(false == locked);
+
+        uint256 currentBalance = balanceOf(_forAddress);
+        uint256 currentTotalSupply = totalSupply();
+
+        return claimInternal(now, _forAddress, currentBalance, currentTotalSupply);
+    }
+
+
+    function claim() public returns (uint256) {
+        require(false == locked);
+
+        return delegatedClaim(msg.sender);
+    }
+
+    function transfer(address _to, uint256 _value) public returns (bool) {
+        return claimableTransfer(now, _to, _value);
+    }
+
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+        return claimableTransferFrom(now, _from, _to, _value);
+    }
+
+
+    function calculateEmissionTokens(uint256 _lastClaimedAt, uint256 _currentTime, uint256 _currentBalance, uint256 _totalSupply) internal returns (uint256 tokens) {
         uint256 totalTokens = 0;
 
-        uint256 newCurrentTime = lastClaimedAt;
-        uint256 remainingSeconds = currentTime - lastClaimedAt;
+        uint256 newCurrentTime = _lastClaimedAt;
+        uint256 remainingSeconds = _currentTime - _lastClaimedAt;
 
         uint256 collectedTokensPerPeriod;
 
@@ -79,7 +109,7 @@ contract GenesisToken is MintingERC20 {
                 if(newCurrentTime + remainingSeconds > emission.periodEndsAt) {
                     uint256 diff = emission.periodEndsAt  - newCurrentTime;
 
-                    collectedTokensPerPeriod = ((diff / emission.blockDuration) * emission.blockTokens * currentBalance) / totalSupply;
+                    collectedTokensPerPeriod = ((diff / emission.blockDuration) * emission.blockTokens * _currentBalance) / _totalSupply;
 
                     totalTokens += collectedTokensPerPeriod;
 
@@ -87,7 +117,7 @@ contract GenesisToken is MintingERC20 {
                     newCurrentTime += diff;
                 }
                 else {
-                    collectedTokensPerPeriod = ((remainingSeconds / emission.blockDuration) * emission.blockTokens * currentBalance) / totalSupply;
+                    collectedTokensPerPeriod = ((remainingSeconds / emission.blockDuration) * emission.blockTokens * _currentBalance) / _totalSupply;
 
                     totalTokens += collectedTokensPerPeriod;
 
@@ -103,17 +133,17 @@ contract GenesisToken is MintingERC20 {
         return totalTokens;
     }
 
-    function tokensClaimedHook(address _holder, uint256 since, uint256 till, uint256 tokens) internal {
-        ClaimedTokens(_holder, since, till, tokens);
+    function tokensClaimedHook(address _holder, uint256 _since, uint256 _till, uint256 _tokens) internal {
+        ClaimedTokens(_holder, _since, _till, _tokens);
     }
 
-    function claimInternal(uint256 time, address _address, uint256 currentBalance, uint256 currentTotalSupply) internal returns (uint256) {
-        if(time < emitTokensSince) {
+    function claimInternal(uint256 _time, address _address, uint256 _currentBalance, uint256 _currentTotalSupply) internal returns (uint256) {
+        if(_time < emitTokensSince) {
             return 0;
         }
 
-        if(currentBalance == 0) {
-            lastClaims[_address] = time;
+        if(_currentBalance == 0) {
+            lastClaims[_address] = _time;
 
             return 0;
         }
@@ -125,16 +155,16 @@ contract GenesisToken is MintingERC20 {
             lastClaimAt = emitTokensSince;
         }
 
-        if(lastClaimAt >= time) {
+        if(lastClaimAt >= _time) {
             return 0;
         }
 
-        uint256 tokens = calculateEmissionTokens(lastClaimAt, time, currentBalance, currentTotalSupply);
+        uint256 tokens = calculateEmissionTokens(lastClaimAt, _time, _currentBalance, _currentTotalSupply);
 
         if(tokens > 0) {
-            tokensClaimedHook(_address, lastClaimAt, time, tokens);
+            tokensClaimedHook(_address, lastClaimAt, _time, tokens);
 
-            lastClaims[_address] = time;
+            lastClaims[_address] = _time;
 
             return tokens;
         }
@@ -142,28 +172,7 @@ contract GenesisToken is MintingERC20 {
         return 0;
     }
 
-
-    /* this function allows anyone to claim daughter tokens for a specified genesis account;
-    no worries, the newly mined tokens will go to genesis holder address
-    */
-    function delegatedClaim(address _forAddress) returns (uint256) {
-        require(false == locked);
-
-        uint256 currentBalance = balanceOf(_forAddress);
-        uint256 currentTotalSupply = totalSupply();
-
-        return claimInternal(now, _forAddress, currentBalance, currentTotalSupply);
-    }
-
-
-    function claim() returns (uint256) {
-        require(false == locked);
-
-        return delegatedClaim(msg.sender);
-    }
-
-
-    function claimableTransfer(uint256 time, address _to, uint256 _value) internal returns (bool) {
+    function claimableTransfer(uint256 _time, address _to, uint256 _value) internal returns (bool) {
         uint256 senderCurrentBalance = balanceOf(msg.sender);
         uint256 receiverCurrentBalance = balanceOf(_to);
 
@@ -173,17 +182,13 @@ contract GenesisToken is MintingERC20 {
 
         require(status);
 
-        claimInternal(time, msg.sender, senderCurrentBalance, _totalSupply);
-        claimInternal(time, _to, receiverCurrentBalance, _totalSupply);
+        claimInternal(_time, msg.sender, senderCurrentBalance, _totalSupply);
+        claimInternal(_time, _to, receiverCurrentBalance, _totalSupply);
 
         return true;
     }
 
-    function transfer(address _to, uint256 _value) returns (bool) {
-        return claimableTransfer(now, _to, _value);
-    }
-
-    function claimableTransferFrom(uint256 time, address _from, address _to, uint256 _value) returns (bool success) {
+    function claimableTransferFrom(uint256 _time, address _from, address _to, uint256 _value) internal returns (bool success) {
         uint256 senderCurrentBalance = balanceOf(_from);
         uint256 receiverCurrentBalance = balanceOf(_to);
 
@@ -192,14 +197,10 @@ contract GenesisToken is MintingERC20 {
         bool status = super.transferFrom(_from, _to, _value);
 
         if(status) {
-            claimInternal(time, _from, senderCurrentBalance, _totalSupply);
-            claimInternal(time, _to, receiverCurrentBalance, _totalSupply);
+            claimInternal(_time, _from, senderCurrentBalance, _totalSupply);
+            claimInternal(_time, _to, receiverCurrentBalance, _totalSupply);
         }
 
         return status;
-    }
-
-    function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-        return claimableTransferFrom(now, _from, _to, _value);
     }
 }
