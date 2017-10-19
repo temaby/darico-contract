@@ -10,7 +10,7 @@ contract DaricoGenesis is GenesisToken {
 
     // Variables
 
-    uint256 public  maxSupply = 78 * 10 ** 3 * uint(10) ** decimals;
+    uint256 public  maxSupply = uint256(78).mul(10 ** 3).mul(uint(10) ** decimals);
     uint256 public createdAt;
     uint8 public  decimals = 0;
 

@@ -94,7 +94,7 @@ contract GenesisToken is MintingERC20 {
         uint256 totalTokens = 0;
 
         uint256 newCurrentTime = _lastClaimedAt;
-        uint256 remainingSeconds = _currentTime - _lastClaimedAt;
+        uint256 remainingSeconds = _currentTime.sub(_lastClaimedAt);
 
         uint256 collectedTokensPerPeriod;
 
@@ -106,10 +106,10 @@ contract GenesisToken is MintingERC20 {
             }
 
             if(newCurrentTime < emission.periodEndsAt) {
-                if(newCurrentTime + remainingSeconds > emission.periodEndsAt) {
-                    uint256 diff = emission.periodEndsAt  - newCurrentTime;
+                if(newCurrentTime.add(remainingSeconds) > emission.periodEndsAt) {
+                    uint256 diff = emission.periodEndsAt.sub(newCurrentTime);
 
-                    collectedTokensPerPeriod = ((diff / emission.blockDuration) * emission.blockTokens * _currentBalance) / _totalSupply;
+                    collectedTokensPerPeriod = ((diff.div(emission.blockDuration)).mul(emission.blockTokens).mul(_currentBalance)).div(_totalSupply);
 
                     totalTokens += collectedTokensPerPeriod;
 
@@ -117,7 +117,7 @@ contract GenesisToken is MintingERC20 {
                     newCurrentTime += diff;
                 }
                 else {
-                    collectedTokensPerPeriod = ((remainingSeconds / emission.blockDuration) * emission.blockTokens * _currentBalance) / _totalSupply;
+                    collectedTokensPerPeriod = ((remainingSeconds.div(emission.blockDuration)).mul(emission.blockTokens).mul(_currentBalance)).div(_totalSupply);
 
                     totalTokens += collectedTokensPerPeriod;
 

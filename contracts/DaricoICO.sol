@@ -3,6 +3,7 @@ pragma solidity ^0.4.13;
 
 import "./DaricoGenesis.sol";
 import "./Darico.sol";
+import './SafeMath.sol';
 
 
 /*
@@ -14,7 +15,7 @@ NB! DON'T FORGET TO ADD ADDRESS OF THIS CONTRACT AS MINTERS TO DARICO AND GENESI
 */
 
 contract DaricoICO is Ownable {
-
+    using SafeMath for uint256;
 
     // Constants
 
@@ -83,13 +84,13 @@ contract DaricoICO is Ownable {
         drx = DaricoGenesis(_drx);
         drc = Darico(_drc);
 
-        phases.push(Phase(100, 5 * 10 ** 6 * DRC_DECIMALS));
-        phases.push(Phase(85, 10 * 10 ** 6 * DRC_DECIMALS));
-        phases.push(Phase(70, 10 * 10 ** 6 * DRC_DECIMALS));
-        phases.push(Phase(55, 10 * 10 ** 6 * DRC_DECIMALS));
-        phases.push(Phase(40, 10 * 10 ** 6 * DRC_DECIMALS));
-        phases.push(Phase(25, 10 * 10 ** 6 * DRC_DECIMALS));
-        phases.push(Phase(10, 5 * 10 ** 6 * DRC_DECIMALS));
+        phases.push(Phase(100, uint256(5).mul(uint256(10 ** 6)).mul(DRC_DECIMALS)));
+        phases.push(Phase(85, uint256(10).mul(uint256(10 ** 6)).mul(DRC_DECIMALS)));
+        phases.push(Phase(70, uint256(10).mul(uint256(10 ** 6)).mul(DRC_DECIMALS)));
+        phases.push(Phase(55, uint256(10).mul(uint256(10 ** 6)).mul(DRC_DECIMALS)));
+        phases.push(Phase(40, uint256(10).mul(uint256(10 ** 6)).mul(DRC_DECIMALS)));
+        phases.push(Phase(25, uint256(10).mul(uint256(10 ** 6)).mul(DRC_DECIMALS)));
+        phases.push(Phase(10, uint256(5).mul(uint256(10 ** 6)).mul(DRC_DECIMALS)));
 
         icoSince = _icoSince;
         icoTill = _icoTill;
@@ -103,16 +104,16 @@ contract DaricoICO is Ownable {
 
     function internalFinishICO() internal {
         require(false == icoFinished);
-        if ((drcSold * 3 / 10) > 0) {
+        if ((drcSold.mul(uint256(3)).div(uint256(10))) > 0) {
             //mint 30% on top for the team
-            uint256 drcMintedAmount = drc.mint(team, drcSold * 3 / 10);
-            require(drcMintedAmount == drcSold * 3 / 10);
+            uint256 drcMintedAmount = drc.mint(team, drcSold.mul(uint256(3)).div(uint256(10)));
+            require(drcMintedAmount == drcSold.mul(uint256(3)).div(uint256(10)));
         }
 
-        if ((drxSold * 3 / 10) > 0) {
+        if ((drxSold.mul(uint256(3)).div(uint256(10))) > 0) {
             // 60M * 3 / 10 = 6 * 3 = 18 M
-            uint256 drxMintedAmount = drx.mint(team, drxSold * 3 / 10);
-            require(drxMintedAmount == drxSold * 3 / 10);
+            uint256 drxMintedAmount = drx.mint(team, drxSold.mul(uint256(3)).div(uint256(10)));
+            require(drxMintedAmount == drxSold.mul(uint256(3)).div(uint256(10)));
         }
 
         icoFinished = true;
@@ -136,12 +137,12 @@ contract DaricoICO is Ownable {
     function internalMintFor(address _addr, uint256 _eth) internal returns (bool success) {// @TODO check if modifier ok for internal function << change to internal if true
         uint256 balDRC = calculateDRCAmountForEth(_eth);
         // @TODO is it ok that there is the time between calculation and minting?
-        require(balDRC + drcSold <= DRC_SALE_SUPPLY);
+        require(balDRC.add(drcSold) <= DRC_SALE_SUPPLY);
         drcSold += balDRC;
         uint256 drcMintedAmount = drc.mint(_addr, balDRC);
         require(drcMintedAmount == balDRC);
 
-        uint256 balDRX = _eth * DRX_DECIMALS / ETHDRX;
+        uint256 balDRX = _eth.mul(DRX_DECIMALS).div(ETHDRX);
         if (balDRX > 0) {
             drxSold += balDRX;
             uint256 drxMintedAmount = drx.mint(_addr, balDRX);
@@ -175,17 +176,17 @@ contract DaricoICO is Ownable {
             }
 
             //calculate how much from the phase is left
-            currentPhaseMaxDRCAvailable = cumulativePhaseVolumes - drcSold;
-            if (currentPhaseMaxDRCAvailable * DRC_DECIMALS / (phases[i].drcEthPrice * DRC_DECIMALS) > ethersLeft) {
+            currentPhaseMaxDRCAvailable = cumulativePhaseVolumes.sub(drcSold);
+            if (currentPhaseMaxDRCAvailable.mul(DRC_DECIMALS).div((phases[i].drcEthPrice).mul(DRC_DECIMALS)) > ethersLeft) {
                 //buy for the remaining ETH
-                drcToSell += ethersLeft * phases[i].drcEthPrice;
+                drcToSell += ethersLeft.mul(phases[i].drcEthPrice);
                 ethersLeft = 0;
 
             }
             else {
                 //buy the remaining DRC of current phase and move on to next phase
                 drcToSell += currentPhaseMaxDRCAvailable;
-                ethersLeft -= currentPhaseMaxDRCAvailable / phases[i].drcEthPrice;
+                ethersLeft -= currentPhaseMaxDRCAvailable.div(phases[i].drcEthPrice);
             }
 
         }

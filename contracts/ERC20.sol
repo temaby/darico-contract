@@ -1,27 +1,37 @@
 pragma solidity ^0.4.13;
 
-import './Ownable.sol';
 
-contract tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData); }
+import './Ownable.sol';
+import './SafeMath.sol';
+
+contract tokenRecipient {function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData);}
+
 
 contract ERC20 is Ownable {
+    using SafeMath for uint256;
     /* Public variables of the token */
     uint256 public initialSupply;
+
     uint256 public creationBlock;
+
     uint8 public decimals;
 
     string public name;
+
     string public symbol;
+
     string public standard;
 
     bool public locked;
 
 
     mapping (address => uint256) public balances;
-    mapping (address => mapping (address => uint256)) public allowance;
+
+    mapping (address => mapping (address => uint256)) public allowed;
 
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint256 value);
+
     event Approval(address indexed _owner, address indexed _spender, uint _value);
 
 
@@ -76,11 +86,11 @@ contract ERC20 is Ownable {
     }
 
     function approve(address _spender, uint256 _value) public returns (bool success) {
-        if(locked) {
+        if (locked) {
             return false;
         }
 
-        allowance[msg.sender][_spender] = _value;
+        allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
 
         return true;
@@ -104,14 +114,14 @@ contract ERC20 is Ownable {
             return false;
         }
 
-        if (allowance[_from][msg.sender] < _value) {
+        if (allowed[_from][msg.sender] < _value) {
             return false;
         }
 
         bool _success = transferInternal(_from, _to, _value);
 
         if (_success) {
-            allowance[_from][msg.sender] -= _value;
+            allowed[_from][msg.sender] -= _value;
         }
 
         return _success;
@@ -131,12 +141,12 @@ contract ERC20 is Ownable {
             return false;
         }
 
-        if (balances[_to] + _value <= balances[_to]) {
+        if (balances[_to].add(_value) <= balances[_to]) {
             return false;
         }
 
-        setBalance(_from, balances[_from] - _value);
-        setBalance(_to, balances[_to] + _value);
+        setBalance(_from, balances[_from].sub(_value));
+        setBalance(_to, balances[_to].add(_value));
 
         Transfer(_from, _to, _value);
 
@@ -144,11 +154,15 @@ contract ERC20 is Ownable {
     }
 
     /*constant functions*/
-    function totalSupply() constant returns (uint256) {
+    function totalSupply() public constant returns (uint256) {
         return initialSupply;
     }
 
-    function balanceOf(address _address) constant returns (uint256) {
+    function balanceOf(address _address) public constant returns (uint256 balance) {
         return balances[_address];
+    }
+
+    function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
+        return allowed[_owner][_spender];
     }
 }
