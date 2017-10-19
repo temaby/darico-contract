@@ -386,6 +386,7 @@ contract('DaricoGenesis', function (accounts) {
             .then(function () {
                 return drx.testClaim(emitTokensSince + 40, {from: accounts[1]});
             })
+            // if here is an error  try to run test-file separetely (seems problem with time)
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 9940068493000000000))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1009940068493000000000))
     });
