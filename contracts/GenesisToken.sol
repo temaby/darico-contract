@@ -64,7 +64,6 @@ contract GenesisToken is MintingERC20 {
     no worries, the newly mined tokens will go to genesis holder address
      created for cold storage tokens
     */
-//@todo check  for beneficiaries
     function delegatedClaim(address _forAddress) public returns (uint256) {
         require(false == locked);
 

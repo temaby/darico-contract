@@ -23,9 +23,9 @@ contract DaricoICOTest is DaricoICO {
         ethersContributed += msg.value;
     }
 
-    function testDRCAmount(uint256 _soldTokens, uint256 _val) returns (uint256){
-        drcSold = _soldTokens;
-        return calculateDRCAmountForEth(_val);
+    function testDRCAmount(uint256 ethersContributed, uint256 _val) returns (uint256){
+        ethersContributed = ethersContributed;
+        return super.getIcoTokensAmount(ethersContributed, _val);
     }
 
     function changeICOPeriod(uint256 _icoSince, uint256 _icoTill) onlyOwner{
@@ -34,6 +34,6 @@ contract DaricoICOTest is DaricoICO {
     }
 
     function testCalculateDRCAmountForEth(uint256 _eth) returns (uint256){
-     return super.calculateDRCAmountForEth(_eth);
+     return super.getIcoTokensAmount(ethersContributed, _eth);
     }
 }

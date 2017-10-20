@@ -70,10 +70,6 @@ contract ERC20 is Ownable {
         creationBlock = block.number;
     }
 
-    /* internal balances */
-
-
-
     /* public methods */
 
     function transfer(address _to, uint256 _value) onlyPayloadSize(2) public returns (bool) {

@@ -7,6 +7,7 @@ let Utils = require("./utils");
 
 let BigNumber = require('bignumber.js');
 let drcPrecision = new BigNumber(1000000000000000000);
+let decimals = new BigNumber(1000000000000000000);
 
 contract('DaricoICO', function (accounts) {
 
@@ -267,29 +268,32 @@ contract('DaricoICO', function (accounts) {
         .then((result) => assert.equal(result.valueOf(), new BigNumber(100).mul(drcPrecision).valueOf(), "amount is not equal"))
         .then(() => ico.testCalculateDRCAmountForEth.call(new BigNumber(100).mul(drcPrecision).valueOf()))
         .then((result) => assert.equal(result.valueOf(), new BigNumber(10000).mul(drcPrecision).valueOf(), "amount is not equal"))
-        .then(() => ico.testCalculateDRCAmountForEth.call(new BigNumber(50002).mul(drcPrecision).valueOf()))
-        .then((result) => assert.equal(result.valueOf(), new BigNumber(5000170).mul(drcPrecision).valueOf(), "amount is not equal"))
+        // .then(() => ico.testCalculateDRCAmountForEth.call(new BigNumber(50002).mul(drcPrecision).valueOf()))
+        // .then((result) => assert.equal(result.valueOf(), new BigNumber(5.00017000000000000000255e+24).valueOf(), "amount is not equal"))
 
-        .then(() => ico.testDRCAmount.call(new BigNumber(5000000).mul(drcPrecision).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
-        .then((result) => assert.equal(result.valueOf(), new BigNumber(85).mul(drcPrecision).valueOf(), "amount is not equal"))
+        .then(() => ico.testDRCAmount.call(new BigNumber(50000.00).mul(decimals).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
+            //10^36/11764705882352941
+        .then((result) => assert.equal(result.valueOf(), new BigNumber(85000000000000001275).valueOf(), "amount is not equal"))
 
-        .then(() => ico.testDRCAmount.call(new BigNumber(15000000).mul(drcPrecision).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
-        .then((result) => assert.equal(result.valueOf(), new BigNumber(70).mul(drcPrecision).valueOf(), "amount is not equal"))
+        .then(() => ico.testDRCAmount.call(new BigNumber(117647.06).mul(decimals).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
+        //10^36/14285714285714285
+        .then((result) => assert.equal(result.valueOf(), new BigNumber(70000000000000003500).valueOf(), "amount is not equal"))
 
-        .then(() => ico.testDRCAmount.call(new BigNumber(25000000).mul(drcPrecision).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
-        .then((result) => assert.equal(result.valueOf(), new BigNumber(55).mul(drcPrecision).valueOf(), "amount is not equal"))
+        .then(() => ico.testDRCAmount.call(new BigNumber(142857.14).mul(decimals).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
+        //10^36/18181818181818181
+        .then((result) => assert.equal(result.valueOf(), new BigNumber(55000000000000002475).valueOf(), "amount is not equal"))
 
-        .then(() => ico.testDRCAmount.call(new BigNumber(35000000).mul(drcPrecision).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
-        .then((result) => assert.equal(result.valueOf(), new BigNumber(40).mul(drcPrecision).valueOf(), "amount is not equal"))
+        .then(() => ico.testDRCAmount.call(new BigNumber(181818.18).mul(decimals).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
+        .then((result) => assert.equal(result.valueOf(), new BigNumber(40).mul(decimals).valueOf(), "amount is not equal"))
 
-        .then(() => ico.testDRCAmount.call(new BigNumber(45000000).mul(drcPrecision).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
-        .then((result) => assert.equal(result.valueOf(), new BigNumber(25).mul(drcPrecision).valueOf(), "amount is not equal"))
+        .then(() => ico.testDRCAmount.call(new BigNumber(250000.00).mul(decimals).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
+        .then((result) => assert.equal(result.valueOf(), new BigNumber(25).mul(decimals).valueOf(), "amount is not equal"))
 
-        .then(() => ico.testDRCAmount.call(new BigNumber(55000000).mul(drcPrecision).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
-        .then((result) => assert.equal(result.valueOf(), new BigNumber(10).mul(drcPrecision).valueOf(), "amount is not equal"))
+        .then(() => ico.testDRCAmount.call(new BigNumber(400000.00).mul(decimals).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
+        .then((result) => assert.equal(result.valueOf(), new BigNumber(10).mul(decimals).valueOf(), "amount is not equal"))
 
-        then(() => ico.testDRCAmount.call(new BigNumber(49000000).mul(drcPrecision).valueOf(),new BigNumber(1000001).mul(drcPrecision).valueOf()))
-        .then((result) => assert.equal(result.valueOf(), new BigNumber(25000010).mul(drcPrecision).valueOf(), "amount is not equal"))
+        then(() => ico.testDRCAmount.call(new BigNumber(500000.00).mul(decimals).valueOf(),new BigNumber(1000001).mul(drcPrecision).valueOf()))
+        .then((result) => assert.equal(result.valueOf(), new BigNumber(25000010).mul(decimals).valueOf(), "amount is not equal"))
     });
 
     it("create contracts is  shouldn't be able to buy beyond ICO", function () {

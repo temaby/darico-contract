@@ -10,17 +10,15 @@ contract DaricoGenesis is GenesisToken {
 
     // Variables
 
-    uint8 public  decimals = 0;
     uint256 public  maxSupply = uint256(78).mul(10 ** 3).mul(uint(10) ** decimals);
     uint256 public createdAt;
 
-    string public  name = "Darico Genesis";
-    string public  symbol = "DRX";
+//    string public  name = "Darico Genesis";
+//    string public  symbol = "DRX";
 
     mapping (address => address) public beneficiaries;
 
     Darico public drc;
-
 
     // Events
     event BeneficiarySet(address _drx, address _newBeneficiary);
@@ -32,8 +30,7 @@ contract DaricoGenesis is GenesisToken {
         uint256 _initialSupply,
         address _drc
     )
-
-    GenesisToken(_initialSupply, decimals, name, symbol, true, false, _emitSince, maxSupply)
+    GenesisToken(_initialSupply, 0, 'Darico Genesis', 'DRX', true, false, _emitSince, maxSupply)
     {
         standard = "Darico Genesis 0.1";
 
