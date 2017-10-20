@@ -1,32 +1,45 @@
 pragma solidity ^0.4.13;
 
-import "../Genesis.sol";
+import "../GenesisToken.sol";
+import "../AbstractClaimableToken.sol";
 
-contract TestGenesisToken is Genesis {
-    function TestGenesisToken(uint256 emitSince, bool initEmission, uint256 initialSupply, uint8 precision, string tokenName, string tokenSymbol)
-        Genesis(emitSince, initEmission, initialSupply, precision, tokenName, tokenSymbol)
+contract TestGenesisToken is GenesisToken {
+    AbstractClaimableToken public claimableToken;
+    uint256 public createdAt;
+
+    function TestGenesisToken()
+    GenesisToken(5000000 * 10 ** 18, 18, "Test Genesis Token", "TGT", true, false, now, 5000000 * 10 ** 18)
     {
+        standard = "Test Genesis Token 0.1";
+
+        createdAt = now;
 
     }
 
+    function setClaimableToken(AbstractClaimableToken _token) onlyOwner {
+        claimableToken = _token;
+    }
 
-    function testDelegatedClaim(address forAddress, uint256 time) returns (uint256) {
-        uint256 currentBalance = balanceOf(forAddress);
+    function tokensClaimedHook(address _holder, uint256 _since, uint256 _till, uint256 _tokens) internal {
+        claimableToken.claimedTokens(_holder, _tokens);
+
+        ClaimedTokens(_holder, _since, _till, _tokens);
+    }
+
+    function testClaim(uint256 _time) returns (uint256) {
+        uint256 currentBalance = balanceOf(msg.sender);
         uint256 currentTotalSupply = totalSupply();
 
-        return claimInternal(time, forAddress, currentBalance, currentTotalSupply);
-
+        return claimInternal(_time, msg.sender, currentBalance, currentTotalSupply);
     }
 
-    function testClaim(uint256 time) returns (uint256) {
-        return testDelegatedClaim(msg.sender, time);
+    function testTransfer(uint256 _time, address _to, uint256 _value) {
+        claimableTransfer(_time, _to, _value);
     }
 
-
-    function testTransfer(uint256 time, address _to, uint256 _value) {
-        claimableTransfer(time, _to, _value);
+    function testCalculateEmissionTokens(uint256 _lastClaimedAt, uint256 _currentTime, uint256 _currentBalance, uint256 _totalSupply) returns (uint256 tokens){
+        return super.calculateEmissionTokens(_lastClaimedAt, _currentTime, _currentBalance, _totalSupply);
     }
-
 
     function nonClaimableTransfer(address _to, uint256 _value) {
         transferInternal(msg.sender, _to, _value);
