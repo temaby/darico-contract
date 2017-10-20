@@ -60,6 +60,10 @@ contract DaricoICO is Ownable {
 
     Phase [] public phases;
 
+    //Events
+
+    event  Minted(address indexed to,  uint256 valueDRC, uint256 valueDRX);
+
     // Modifiers
 
     modifier duringICO() {
@@ -153,6 +157,7 @@ contract DaricoICO is Ownable {
             internalFinishICO();
         }
         if (drcMintedAmount > 0) {
+            Minted(_addr, drcMintedAmount, drxMintedAmount);
             return true;
         }
         return false;
@@ -168,16 +173,16 @@ contract DaricoICO is Ownable {
             Phase storage phase = phases[i];
 
             if(phase.maxAmount > newCollectedEthers) {
-                if (newCollectedEthers + remainingValue > phase.maxAmount) {
-                    uint256 diff = phase.maxAmount - newCollectedEthers;
+                if (newCollectedEthers.add(remainingValue) > phase.maxAmount) {
+                    uint256 diff = phase.maxAmount.sub(newCollectedEthers);
 
-                    amount += diff * DRC_DECIMALS / phase.price;
+                    amount += diff.mul(DRC_DECIMALS).div(phase.price);
 
                     remainingValue -= diff;
                     newCollectedEthers += diff;
                 }
                 else {
-                    amount += remainingValue * DRC_DECIMALS / phase.price;
+                    amount += remainingValue.mul(DRC_DECIMALS).div(phase.price);
 
                     newCollectedEthers += remainingValue;
 
