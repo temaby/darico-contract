@@ -204,11 +204,10 @@ contract('DaricoGenesis', function (accounts) {
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 9940068493000000000))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1009940068493000000000))
     });
-    it("NON DRX holder should not be able to set the beneficiary", function () {
+    it("NON DRX holder should  be able to set the beneficiary", function () {
         return createAllContracts(accounts)
             .then(() => drx.setBeneficiary(accounts[3]))
-            .then(Utils.receiptShouldFailed)
-            .catch(Utils.catchReceiptShouldFailed)
+            .then(Utils.receiptShouldSucceed)
     });
     it("test Darico genesis token with claimable token", function () {
         var instance;
