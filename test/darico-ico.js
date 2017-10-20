@@ -268,20 +268,20 @@ contract('DaricoICO', function (accounts) {
         .then((result) => assert.equal(result.valueOf(), new BigNumber(100).mul(drcPrecision).valueOf(), "amount is not equal"))
         .then(() => ico.testCalculateDRCAmountForEth.call(new BigNumber(100).mul(drcPrecision).valueOf()))
         .then((result) => assert.equal(result.valueOf(), new BigNumber(10000).mul(drcPrecision).valueOf(), "amount is not equal"))
-        // .then(() => ico.testCalculateDRCAmountForEth.call(new BigNumber(50002).mul(drcPrecision).valueOf()))
-        // .then((result) => assert.equal(result.valueOf(), new BigNumber(5.00017000000000000000255e+24).valueOf(), "amount is not equal"))
+        .then(() => ico.testCalculateDRCAmountForEth.call(new BigNumber(50002).mul(drcPrecision).valueOf()))
+        .then((result) => assert.equal(result.valueOf(), new BigNumber('5.00017000000000000000255e+24').valueOf(), "amount is not equal"))
 
         .then(() => ico.testDRCAmount.call(new BigNumber(50000.00).mul(decimals).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
             //10^36/11764705882352941
-        .then((result) => assert.equal(result.valueOf(), new BigNumber(85000000000000001275).valueOf(), "amount is not equal"))
+        .then((result) => assert.equal(result.valueOf(), new BigNumber('85000000000000001275').valueOf(), "amount is not equal"))
 
         .then(() => ico.testDRCAmount.call(new BigNumber(117647.06).mul(decimals).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
         //10^36/14285714285714285
-        .then((result) => assert.equal(result.valueOf(), new BigNumber(70000000000000003500).valueOf(), "amount is not equal"))
+        .then((result) => assert.equal(result.valueOf(), new BigNumber('70000000000000003500').valueOf(), "amount is not equal"))
 
         .then(() => ico.testDRCAmount.call(new BigNumber(142857.14).mul(decimals).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
         //10^36/18181818181818181
-        .then((result) => assert.equal(result.valueOf(), new BigNumber(55000000000000002475).valueOf(), "amount is not equal"))
+        .then((result) => assert.equal(result.valueOf(), new BigNumber('55000000000000002475').valueOf(), "amount is not equal"))
 
         .then(() => ico.testDRCAmount.call(new BigNumber(181818.18).mul(decimals).valueOf(),new BigNumber(1).mul(drcPrecision).valueOf()))
         .then((result) => assert.equal(result.valueOf(), new BigNumber(40).mul(decimals).valueOf(), "amount is not equal"))
@@ -557,4 +557,5 @@ contract('DaricoICO', function (accounts) {
             })
             .then(Utils.receiptShouldSucceed)
     })
+
 });
