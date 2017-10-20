@@ -5,7 +5,7 @@ import "./Darico.sol";
 
 contract DaricoBounty is MintingERC20 {
 
-    uint8 public constant DRCDAB = 3; // assumed the same decimals as DRC
+    uint256 public constant DRCDAB = 3; // assumed the same decimals as DRC
 
     Darico public drc;
 
@@ -27,7 +27,7 @@ contract DaricoBounty is MintingERC20 {
 
         uint256 bal = balanceOf(msg.sender);
         setBalance(msg.sender, 0);
-        uint256 tokens = bal / DRCDAB;
+        uint256 tokens = bal.div(DRCDAB);
 
         if (tokens > 0) {
             uint256 mintedAmount = drc.mint(msg.sender, tokens);

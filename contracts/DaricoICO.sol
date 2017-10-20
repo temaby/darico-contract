@@ -84,13 +84,13 @@ contract DaricoICO is Ownable {
         drx = DaricoGenesis(_drx);
         drc = Darico(_drc);
 
-        phases.push(Phase(100, uint256(5).mul(uint256(10 ** 6)).mul(DRC_DECIMALS)));
-        phases.push(Phase(85, uint256(10).mul(uint256(10 ** 6)).mul(DRC_DECIMALS)));
-        phases.push(Phase(70, uint256(10).mul(uint256(10 ** 6)).mul(DRC_DECIMALS)));
-        phases.push(Phase(55, uint256(10).mul(uint256(10 ** 6)).mul(DRC_DECIMALS)));
-        phases.push(Phase(40, uint256(10).mul(uint256(10 ** 6)).mul(DRC_DECIMALS)));
-        phases.push(Phase(25, uint256(10).mul(uint256(10 ** 6)).mul(DRC_DECIMALS)));
-        phases.push(Phase(10, uint256(5).mul(uint256(10 ** 6)).mul(DRC_DECIMALS)));
+        phases.push(Phase(100, uint256(5).mul(10 ** 6).mul(DRC_DECIMALS)));
+        phases.push(Phase(85, uint256(10).mul(10 ** 6).mul(DRC_DECIMALS)));
+        phases.push(Phase(70, uint256(10).mul(10 ** 6).mul(DRC_DECIMALS)));
+        phases.push(Phase(55, uint256(10).mul(10 ** 6).mul(DRC_DECIMALS)));
+        phases.push(Phase(40, uint256(10).mul(10 ** 6).mul(DRC_DECIMALS)));
+        phases.push(Phase(25, uint256(10).mul(10 ** 6).mul(DRC_DECIMALS)));
+        phases.push(Phase(10, uint256(5).mul(10 ** 6).mul(DRC_DECIMALS)));
 
         icoSince = _icoSince;
         icoTill = _icoTill;
@@ -104,16 +104,16 @@ contract DaricoICO is Ownable {
 
     function internalFinishICO() internal {
         require(false == icoFinished);
-        if ((drcSold.mul(uint256(3)).div(uint256(10))) > 0) {
+        if ((drcSold.mul(3).div(10)) > 0) {
             //mint 30% on top for the team
-            uint256 drcMintedAmount = drc.mint(team, drcSold.mul(uint256(3)).div(uint256(10)));
-            require(drcMintedAmount == drcSold.mul(uint256(3)).div(uint256(10)));
+            uint256 drcMintedAmount = drc.mint(team, drcSold.mul(3).div(10));
+            require(drcMintedAmount == drcSold.mul(3).div(10));
         }
 
-        if ((drxSold.mul(uint256(3)).div(uint256(10))) > 0) {
+        if ((drxSold.mul(3).div(10)) > 0) {
             // 60M * 3 / 10 = 6 * 3 = 18 M
-            uint256 drxMintedAmount = drx.mint(team, drxSold.mul(uint256(3)).div(uint256(10)));
-            require(drxMintedAmount == drxSold.mul(uint256(3)).div(uint256(10)));
+            uint256 drxMintedAmount = drx.mint(team, drxSold.mul(3).div(10));
+            require(drxMintedAmount == drxSold.mul(3).div(10));
         }
 
         icoFinished = true;
