@@ -109,7 +109,7 @@ contract ERC20 is Ownable {
         }
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+    function transferFrom(address _from, address _to, uint256 _value) onlyPayloadSize(3) public returns (bool success) {
         if (locked) {
             return false;
         }
@@ -140,11 +140,6 @@ contract ERC20 is Ownable {
         if (balances[_from] < _value) {
             return false;
         }
-
-        if (balances[_to].add(_value) <= balances[_to]) {
-            return false;
-        }
-
         setBalance(_from, balances[_from].sub(_value));
         setBalance(_to, balances[_to].add(_value));
 

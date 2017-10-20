@@ -23,7 +23,7 @@ contract DaricoBounty is MintingERC20 {
     }
 
     function toDarico() public {
-        require(0x0 != address(drc));
+        require(address(0) != address(drc));
 
         uint256 bal = balanceOf(msg.sender);
         setBalance(msg.sender, 0);

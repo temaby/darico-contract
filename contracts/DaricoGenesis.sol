@@ -10,9 +10,9 @@ contract DaricoGenesis is GenesisToken {
 
     // Variables
 
+    uint8 public  decimals = 0;
     uint256 public  maxSupply = uint256(78).mul(10 ** 3).mul(uint(10) ** decimals);
     uint256 public createdAt;
-    uint8 public  decimals = 0;
 
     string public  name = "Darico Genesis";
     string public  symbol = "DRX";
@@ -57,7 +57,7 @@ contract DaricoGenesis is GenesisToken {
     function getBeneficiary(address _drxHolder) constant returns (address){
         address beneficiary = beneficiaries[_drxHolder];
 
-        if (address(0x0) == beneficiary) {
+        if (address(0) == beneficiary) {
             return _drxHolder;
         }
         else {
@@ -66,7 +66,7 @@ contract DaricoGenesis is GenesisToken {
     }
 
     function setBeneficiary(address _beneficiary) public {
-        require(0x0 != _beneficiary);
+        require(address(0) != _beneficiary);
         require(balanceOf(msg.sender) > 0);
 
         // before the beneficiary is changed, claim the currently mined tokens
@@ -78,7 +78,7 @@ contract DaricoGenesis is GenesisToken {
     }
 
     function tokensClaimedHook(address _holder, uint256 _since, uint256 _till, uint256 _tokens) internal {
-        if (address(drc) != 0x0 && _tokens > 0) {
+        if (address(drc) != address(0) && _tokens > 0) {
             uint256 mintedAmount = drc.mint(getBeneficiary(_holder), _tokens);
             require(mintedAmount == _tokens);
         }
