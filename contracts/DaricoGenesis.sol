@@ -13,9 +13,6 @@ contract DaricoGenesis is GenesisToken {
     uint256 public  maxSupply = uint256(78).mul(10 ** 3).mul(uint(10) ** decimals);
     uint256 public createdAt;
 
-//    string public  name = "Darico Genesis";
-//    string public  symbol = "DRX";
-
     mapping (address => address) public beneficiaries;
 
     Darico public drc;
@@ -64,7 +61,6 @@ contract DaricoGenesis is GenesisToken {
 
     function setBeneficiary(address _beneficiary) public {
         require(address(0) != _beneficiary);
-        require(balanceOf(msg.sender) > 0);
 
         // before the beneficiary is changed, claim the currently mined tokens
         claim();
