@@ -79,6 +79,8 @@ contract DaricoGenesis is GenesisToken {
     }
 
     function mint(address _addr, uint256 _amount) public onlyMinters returns (uint256) {
+        delegatedClaim(_addr);
+
         uint256 minted = super.mint(_addr, _amount);
 
         if(minted == _amount) {
