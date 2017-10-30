@@ -1,14 +1,17 @@
-pragma solidity ^0.4.13;
+pragma solidity 0.4.15;
+
+import "./Ownable.sol";
+import "./SafeMath.sol";
 
 
-import './Ownable.sol';
-import './SafeMath.sol';
-
-contract tokenRecipient {function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public;}
+contract TokenRecipient {
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public;
+}
 
 
 contract ERC20 is Ownable {
     using SafeMath for uint256;
+
     /* Public variables of the token */
     uint256 public initialSupply;
 
@@ -24,16 +27,13 @@ contract ERC20 is Ownable {
 
     bool public locked;
 
-
     mapping (address => uint256) public balances;
 
     mapping (address => mapping (address => uint256)) public allowed;
 
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint256 value);
-
     event Approval(address indexed _owner, address indexed _spender, uint _value);
-
 
     modifier onlyPayloadSize(uint _numwords) {
         assert(msg.data.length == _numwords * 32 + 4);
@@ -49,14 +49,13 @@ contract ERC20 is Ownable {
         bool _transferAllSupplyToOwner,
         bool _locked
     ) {
-        standard = 'ERC20 0.1';
+        standard = "ERC20 0.1";
 
         initialSupply = _initialSupply;
 
         if (_transferAllSupplyToOwner) {
             setBalance(msg.sender, initialSupply);
-        }
-        else {
+        } else {
             setBalance(this, initialSupply);
         }
 
@@ -71,9 +70,9 @@ contract ERC20 is Ownable {
     }
 
     /* public methods */
-
-    function transfer(address _to, uint256 _value) onlyPayloadSize(2) public returns (bool) {
+    function transfer(address _to, uint256 _value) public onlyPayloadSize(2) returns (bool) {
         require(locked == false);
+    
         bool status = transferInternal(msg.sender, _to, _value);
 
         require(status == true);
@@ -87,6 +86,7 @@ contract ERC20 is Ownable {
         }
 
         allowed[msg.sender][_spender] = _value;
+
         Approval(msg.sender, _spender, _value);
 
         return true;
@@ -97,7 +97,7 @@ contract ERC20 is Ownable {
             return false;
         }
 
-        tokenRecipient spender = tokenRecipient(_spender);
+        TokenRecipient spender = TokenRecipient(_spender);
 
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -105,7 +105,7 @@ contract ERC20 is Ownable {
         }
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) onlyPayloadSize(3) public returns (bool success) {
+    function transferFrom(address _from, address _to, uint256 _value) public onlyPayloadSize(3) returns (bool success) {
         if (locked) {
             return false;
         }
@@ -123,27 +123,6 @@ contract ERC20 is Ownable {
         return _success;
     }
 
-    /* internal functions*/
-    function setBalance(address _holder, uint256 _amount) internal {
-        balances[_holder] = _amount;
-    }
-
-    function transferInternal(address _from, address _to, uint256 _value) internal returns (bool success) {
-        if (_value == 0) {
-            Transfer(_from, _to, _value);
-            return true;
-        }
-        if (balances[_from] < _value) {
-            return false;
-        }
-        setBalance(_from, balances[_from].sub(_value));
-        setBalance(_to, balances[_to].add(_value));
-
-        Transfer(_from, _to, _value);
-
-        return true;
-    }
-
     /*constant functions*/
     function totalSupply() public constant returns (uint256) {
         return initialSupply;
@@ -155,5 +134,29 @@ contract ERC20 is Ownable {
 
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
+    }
+
+    /* internal functions*/
+    function setBalance(address _holder, uint256 _amount) internal {
+        balances[_holder] = _amount;
+    }
+
+    function transferInternal(address _from, address _to, uint256 _value) internal returns (bool success) {
+        if (_value == 0) {
+            Transfer(_from, _to, _value);
+
+            return true;
+        }
+
+        if (balances[_from] < _value) {
+            return false;
+        }
+
+        setBalance(_from, balances[_from].sub(_value));
+        setBalance(_to, balances[_to].add(_value));
+
+        Transfer(_from, _to, _value);
+
+        return true;
     }
 }

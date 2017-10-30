@@ -1,5 +1,4 @@
-pragma solidity ^0.4.13;
-
+pragma solidity 0.4.15;
 
 import "./AbstractClaimableToken.sol";
 import "./GenesisToken.sol";
@@ -27,11 +26,11 @@ contract DaricoGenesis is GenesisToken {
         uint256 _initialSupply,
         address _drc
     )
-    GenesisToken(_initialSupply, 0, 'Darico Genesis', 'DRX', true, false, _emitSince, maxSupply)
+    GenesisToken(_initialSupply, 0, "Darico Genesis", "DRX", true, false, _emitSince, maxSupply)
     {
         standard = "Darico Genesis 0.1";
-
-        createdAt = now;
+    
+        createdAt = block.timestamp;
         drc = Darico(_drc);
 
         // emissions
@@ -48,13 +47,12 @@ contract DaricoGenesis is GenesisToken {
         drc = Darico(_tokenAddress);
     }
 
-    function getBeneficiary(address _drxHolder) constant returns (address){
+    function getBeneficiary(address _drxHolder) public constant returns (address) {
         address beneficiary = beneficiaries[_drxHolder];
 
         if (address(0) == beneficiary) {
             return _drxHolder;
-        }
-        else {
+        } else {
             return beneficiary;
         }
     }
@@ -70,23 +68,24 @@ contract DaricoGenesis is GenesisToken {
         BeneficiarySet(msg.sender, _beneficiary);
     }
 
-    function tokensClaimedHook(address _holder, uint256 _since, uint256 _till, uint256 _tokens) internal {
-        if (address(drc) != address(0) && _tokens > 0) {
-            uint256 mintedAmount = drc.mint(getBeneficiary(_holder), _tokens);
-            require(mintedAmount == _tokens);
-        }
-        ClaimedTokens(_holder, _since, _till, _tokens);
-    }
-
     function mint(address _addr, uint256 _amount) public onlyMinters returns (uint256) {
         delegatedClaim(_addr);
 
         uint256 minted = super.mint(_addr, _amount);
 
-        if(minted == _amount) {
-            lastClaims[_address] = now;
+        if (minted == _amount) {
+            lastClaims[_addr] = block.timestamp;
         }
 
         return minted;
+    }
+
+    function tokensClaimedHook(address _holder, uint256 _since, uint256 _till, uint256 _tokens) internal {
+        if (address(drc) != address(0) && _tokens > 0) {
+            uint256 mintedAmount = drc.mint(getBeneficiary(_holder), _tokens);
+            require(mintedAmount == _tokens);
+        }
+    
+        ClaimedTokens(_holder, _since, _till, _tokens);
     }
 }

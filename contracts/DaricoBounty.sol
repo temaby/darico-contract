@@ -1,7 +1,8 @@
-pragma solidity ^0.4.13;
+pragma solidity 0.4.15;
 
 import "./MintingERC20.sol";
 import "./Darico.sol";
+
 
 contract DaricoBounty is MintingERC20 {
 
@@ -18,7 +19,7 @@ contract DaricoBounty is MintingERC20 {
         string _symbol)
         MintingERC20(_initialSupply, _maxSupply, _tokenName, _decimals, _symbol, false, false)
     {
-        standard = 'DaricoBounty 0.1';
+        standard = "DaricoBounty 0.1";
         drc = Darico(_drc);
     }
 
@@ -36,6 +37,6 @@ contract DaricoBounty is MintingERC20 {
     }
 
     function setDarico(address _drc) public onlyOwner {
-        drc =  Darico(_drc);
+        drc = Darico(_drc);
     }
 }
