@@ -12,7 +12,7 @@ let precision = new BigNumber(1000000000000000000);
 let team;
 let drx, drc, ico, bounty;
 var createdAt;
-let emitTokensSince = parseInt(new Date().getTime() / 1000);
+let emitTokensSince = parseInt(new Date().getTime() / 1000) - 15;
 
 function createAllContracts(accounts) {
     "use strict";
@@ -77,14 +77,17 @@ contract('DaricoGenesis Test Transfering', function (accounts) {
             .then(function () {
                 return ico.sendTransaction({from: accounts[1], value: new BigNumber(50).mul(precision).valueOf()});
             })
-            .then(Utils.receiptShouldSucceed)
+            .then(()=>{
+                    createdAt = parseInt(new Date().getTime() / 1000);
+                    Utils.receiptShouldSucceed;
+            })
             .then(() => Utils.balanceShouldEqualTo(drx, accounts[1], new BigNumber(5).valueOf()))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(5000).mul(precision).valueOf()))
+            // .then(function () {
+            //     return drx.createdAt.call();
+            // })
             .then(function () {
-                return drx.createdAt.call();
-            })
-            .then(function (result) {
-                createdAt = parseInt(result.valueOf());
+            //     createdAt = parseInt(result.valueOf());
                 console.log(createdAt);
                 console.log(emitTokensSince);
             })
@@ -105,12 +108,12 @@ contract('DaricoGenesis Test Transfering', function (accounts) {
             // // .then((result) => console.log('a3?',result.valueOf()))
             .then(() => console.log('a1',accounts[1]))
             .then(function () {
-                return drx.testClaim(emitTokensSince + 35, {from: accounts[1]});
+                return drx.testClaim(createdAt + 35, {from: accounts[1]});
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 9940068493000000000))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 5009940068493000000000))
             .then(function() {
-                return drx.testTransfer(emitTokensSince + 50, accounts[4], new BigNumber(2), {from: accounts[1]});
+                return drx.testTransfer(createdAt + 50, accounts[4], new BigNumber(2), {from: accounts[1]});
             })
             .then(Utils.receiptShouldSucceed)
             .then(() => Utils.balanceShouldEqualTo(drx, accounts[4], new BigNumber(2)))
@@ -119,7 +122,7 @@ contract('DaricoGenesis Test Transfering', function (accounts) {
             // (15/15 * 9940068493000000000 * 5)/5
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 19880136986000000000))
             .then(function () {
-                return drx.testClaim(emitTokensSince + 65, {from: accounts[1]});
+                return drx.testClaim(createdAt + 65, {from: accounts[1]});
             })
             .then(Utils.receiptShouldSucceed)
             // ((diff / emission.blockDuration) * emission.blockTokens * currentBalance) / totalSupply;
@@ -127,19 +130,19 @@ contract('DaricoGenesis Test Transfering', function (accounts) {
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], new BigNumber(25844178081800000000)))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[4], 0))
             .then(function () {
-                return drx.testClaim(emitTokensSince + 65, {from: accounts[4]});
+                return drx.testClaim(createdAt + 65, {from: accounts[4]});
             })
             .then(Utils.receiptShouldSucceed)
             // (15/15 * 9940068493000000000 * 2)/5
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[4], new BigNumber('3976027397200000000').valueOf()))
             .then(function () {
-                return drx.testClaim(emitTokensSince + 35, {from: accounts[4]});
+                return drx.testClaim(createdAt + 35, {from: accounts[4]});
             })
             .then(Utils.receiptShouldSucceed)
             // (65/15 * 9940068493000000000 * 3)/5
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], new BigNumber(25844178081800000000)))
             .then(function () {
-                return drx.testClaim(emitTokensSince + 35, {from: accounts[4]});
+                return drx.testClaim(createdAt + 35, {from: accounts[4]});
             })
             .then(Utils.receiptShouldSucceed)
             // (65/15 * 9940068493000000000 * 2)/5

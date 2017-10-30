@@ -171,20 +171,23 @@ contract('DaricoGenesis', function (accounts) {
             .then(function () {
                 return ico.sendTransaction({from: accounts[1], value: new BigNumber(10).mul(precision).valueOf()});
             })
-            .then(Utils.receiptShouldSucceed)
+            .then(()=>{
+                createdAt = parseInt(new Date().getTime() / 1000);
+                Utils.receiptShouldSucceed
+            })
             .then(() => Utils.balanceShouldEqualTo(drx, accounts[1], new BigNumber(1).valueOf()))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
+            // .then(function () {
+            //     return drx.createdAt.call();
+            // })
             .then(function () {
-                return drx.createdAt.call();
-            })
-            .then(function (result) {
-                createdAt = parseInt(result.valueOf());
+
                 console.log(createdAt);
                 console.log(emitTokensSince);
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
             .then(function () {
-                return drx.testClaim(emitTokensSince + 15, {from: accounts[1]});
+                return drx.testClaim(createdAt + 15, {from: accounts[1]});
             })
             .then(Utils.receiptShouldSucceed)
             // .then(() => drx.getBeneficiary.call(accounts[1]))
@@ -199,7 +202,7 @@ contract('DaricoGenesis', function (accounts) {
             // .then((result) => console.log('a3?',result.valueOf()))
             .then(() => console.log('a1',accounts[1]))
             .then(function () {
-                return drx.testClaim(emitTokensSince + 35, {from: accounts[1]});
+                return drx.testClaim(createdAt + 35, {from: accounts[1]});
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 9940068493000000000))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1009940068493000000000))
@@ -269,20 +272,20 @@ contract('DaricoGenesis', function (accounts) {
             .then(function () {
                 return ico.sendTransaction({from: accounts[1], value: new BigNumber(10).mul(precision).valueOf()});
             })
-            .then(Utils.receiptShouldSucceed)
+            .then(()=>{
+                createdAt = parseInt(new Date().getTime() / 1000);
+                Utils.receiptShouldSucceed
+            })
             .then(() => Utils.balanceShouldEqualTo(drx, accounts[1], new BigNumber(1).valueOf()))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
+
             .then(function () {
-                return drx.createdAt.call();
-            })
-            .then(function (result) {
-                createdAt = parseInt(result.valueOf());
                 console.log(createdAt);
                 console.log(emitTokensSince);
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
             .then(function () {
-                return drx.testClaim(emitTokensSince + 16, {from: accounts[1]});
+                return drx.testClaim(createdAt + 16, {from: accounts[1]});
             })
             .then(Utils.receiptShouldSucceed)
             // .then(() => drx.getBeneficiary.call(accounts[1]))
@@ -354,14 +357,14 @@ contract('DaricoGenesis', function (accounts) {
             .then(function () {
                 return ico.sendTransaction({from: accounts[1], value: new BigNumber(10).mul(precision).valueOf()});
             })
-            .then(Utils.receiptShouldSucceed)
+            .then(()=>{
+                createdAt = parseInt(new Date().getTime() / 1000);
+            Utils.receiptShouldSucceed
+        })
             .then(() => Utils.balanceShouldEqualTo(drx, accounts[1], new BigNumber(1).valueOf()))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
+
             .then(function () {
-                return drx.createdAt.call();
-            })
-            .then(function (result) {
-                createdAt = parseInt(result.valueOf());
                 console.log('crea',createdAt);
                 console.log('emit',emitTokensSince);
             })
@@ -371,10 +374,18 @@ contract('DaricoGenesis', function (accounts) {
 
             var now = parseInt(new Date().getTime() / 1000);
             console.log('now',now);
-                Utils.timeout(15 - (now - emitTokensSince)/1000);
-            console.log('after15',parseInt(new Date().getTime() / 1000));
             })
-            .then(() => drx.setBeneficiary(accounts[3],{from: accounts[1]}))
+            var testPromise = new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    resolve();
+                }, 15000);
+            });
+            testPromise.then(
+                ()=>{
+                console.log('after15',parseInt(new Date().getTime() / 1000));
+                drx.setBeneficiary(accounts[3],{from: accounts[1]})
+                }
+            )
             .then(() => drx.setBeneficiary(accounts[2],{from: accounts[1]}))
             .then(() => drx.setBeneficiary(accounts[3],{from: accounts[1]}))
             .then(Utils.receiptShouldSucceed)
@@ -383,7 +394,7 @@ contract('DaricoGenesis', function (accounts) {
             // .then((result) => console.log('a3?',result.valueOf()))
             .then(() => console.log('a1',accounts[1]))
             .then(function () {
-                return drx.testClaim(emitTokensSince + 40, {from: accounts[1]});
+                return drx.testClaim(createdAt + 40, {from: accounts[1]});
             })
             // if here is an error  try to run test-file separetely (seems problem with time)
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 9940068493000000000))
