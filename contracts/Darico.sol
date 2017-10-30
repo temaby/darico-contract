@@ -1,7 +1,7 @@
-pragma solidity ^0.4.13;
-
+pragma solidity 0.4.15;
 
 import "./MintingERC20.sol";
+
 
 contract Darico is MintingERC20 {
 
@@ -20,6 +20,6 @@ contract Darico is MintingERC20 {
     MintingERC20(_initialSupply, _maxSupply, _tokenName, _precision, _symbol, true, false)
     {
         standard = "Darico Standard 0.1";
-        createdAt = now;
+        createdAt = block.timestamp;
     }
 }

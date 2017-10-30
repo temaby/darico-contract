@@ -1,5 +1,4 @@
-pragma solidity ^0.4.13;
-
+pragma solidity 0.4.15;
 
 import "./ERC20.sol";
 
@@ -8,9 +7,7 @@ import "./ERC20.sol";
 This contract manages the minters and the modifier to allow mint to happen only if called by minters
 This contract contains basic minting functionality though
 */
-
 contract MintingERC20 is ERC20 {
-
     //Variables
     mapping (address => bool) public minters;
 
@@ -38,16 +35,13 @@ contract MintingERC20 is ERC20 {
         maxSupply = _maxSupply;
     }
 
-
     function addMinter(address _newMinter) public onlyOwner {
         minters[_newMinter] = true;
     }
 
-
     function removeMinter(address _minter) public onlyOwner {
         minters[_minter] = false;
     }
-
 
     function mint(address _addr, uint256 _amount) public onlyMinters returns (uint256) {
         if (locked == true) {

@@ -1,9 +1,8 @@
-pragma solidity ^0.4.13;
-
+pragma solidity 0.4.15;
 
 import "./DaricoGenesis.sol";
 import "./Darico.sol";
-import './SafeMath.sol';
+import "./SafeMath.sol";
 
 
 /*
@@ -13,7 +12,6 @@ mostly by calling their `mint` functions.
 NB! DON'T FORGET TO ADD ADDRESS OF THIS CONTRACT AS MINTERS TO DARICO AND GENESIS SMART CONTRACTS
 
 */
-
 contract DaricoICO is Ownable {
     using SafeMath for uint256;
 
@@ -42,10 +40,8 @@ contract DaricoICO is Ownable {
     uint256 public drxSold;
     uint8 public currentPhase;
 
-
     Darico public drc;
     DaricoGenesis public drx;
-
 
     address public team;
 
@@ -58,16 +54,14 @@ contract DaricoICO is Ownable {
         uint256 maxAmount;
     }
 
-    Phase [] public phases;
+    Phase[] public phases;
 
     //Events
-
-    event  Minted(address indexed to,  uint256 valueDRC, uint256 valueDRX);
+    event  Minted(address indexed to, uint256 valueDRC, uint256 valueDRX);
 
     // Modifiers
-
     modifier duringICO() {
-        require(now >= icoSince && now <= icoTill);
+        require(block.timestamp >= icoSince && block.timestamp <= icoTill);
         require(true == icoOpen);
         _;
     }
@@ -90,21 +84,36 @@ contract DaricoICO is Ownable {
         drc = Darico(_drc);
 
         phases.push(Phase(10000000000000000, uint256(5000000).mul(DRC_DECIMALS), 50000 * 10 ** 18));
-        phases.push(Phase(11764705882352941, uint256(10000000).mul(DRC_DECIMALS), 117647.06 * 10 ** 18)); //11764705882352941.1764705882352941
-        phases.push(Phase(14285714285714285, uint256(10000000).mul(DRC_DECIMALS), 142857.14 * 10 ** 18)); //14285714285714285.7142857142857143
-        phases.push(Phase(18181818181818181, uint256(10000000).mul(DRC_DECIMALS), 181818.18 * 10 ** 18)); //18181818181818181.8181818181818182
+        phases.push(Phase(11764705882352941, uint256(10000000).mul(DRC_DECIMALS), 117647.06 * 10 ** 18));
+        phases.push(Phase(14285714285714285, uint256(10000000).mul(DRC_DECIMALS), 142857.14 * 10 ** 18));
+        phases.push(Phase(18181818181818181, uint256(10000000).mul(DRC_DECIMALS), 181818.18 * 10 ** 18));
         phases.push(Phase(25000000000000000, uint256(10000000).mul(DRC_DECIMALS), 250000 * 10 ** 18));
         phases.push(Phase(40000000000000000, uint256(10000000).mul(DRC_DECIMALS), 400000 * 10 ** 18));
         phases.push(Phase(100000000000000000, uint256(5000000).mul(DRC_DECIMALS), 500000 * 10 ** 18));
 
         icoSince = _icoSince;
         icoTill = _icoTill;
+    }
 
+    function() external payable duringICO nonZero {
+        bool status = internalMintFor(msg.sender, msg.value);
+
+        require(status == true);
+
+        ethersContributed += msg.value;
     }
 
     function finishICO() public onlyOwner {
-        require(now >= icoTill);
+        require(block.timestamp >= icoTill);
         internalFinishICO();
+    }
+
+    function resumeICO() public onlyOwner {
+        icoOpen = true;
+    }
+
+    function pauseICO() public onlyOwner {
+        icoOpen = false;
     }
 
     function internalFinishICO() internal {
@@ -124,20 +133,6 @@ contract DaricoICO is Ownable {
 
         icoFinished = true;
         icoOpen = false;
-    }
-
-    function resumeICO() public onlyOwner {
-        icoOpen = true;
-    }
-
-    function pauseICO() public onlyOwner {
-        icoOpen = false;
-    }
-
-    function() payable duringICO nonZero {
-        bool status = internalMintFor(msg.sender, msg.value);
-        require(status == true);
-        ethersContributed += msg.value;
     }
 
     function internalMintFor(address _addr, uint256 _eth) internal returns (bool success) {
@@ -172,7 +167,7 @@ contract DaricoICO is Ownable {
         for (uint i = 0; i < phases.length; i++) {
             Phase storage phase = phases[i];
 
-            if(phase.maxAmount > newCollectedEthers) {
+            if (phase.maxAmount > newCollectedEthers) {
                 if (newCollectedEthers.add(remainingValue) > phase.maxAmount) {
                     uint256 diff = phase.maxAmount.sub(newCollectedEthers);
 
@@ -180,8 +175,7 @@ contract DaricoICO is Ownable {
 
                     remainingValue -= diff;
                     newCollectedEthers += diff;
-                }
-                else {
+                } else {
                     amount += remainingValue.mul(DRC_DECIMALS).div(phase.price);
 
                     newCollectedEthers += remainingValue;
