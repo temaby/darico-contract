@@ -8,7 +8,7 @@ contract TestGenesisToken is GenesisToken {
     uint256 public createdAt;
 
     function TestGenesisToken()
-    GenesisToken(720000, 18, "Test Genesis Token", "TGT", true, false, now, 720000)
+    GenesisToken(720000, 0, "Test Genesis Token", "TGT", true, false, now, 720000)
     {
         standard = "Test Genesis Token 0.1";
 
@@ -42,6 +42,6 @@ contract TestGenesisToken is GenesisToken {
     }
 
     function nonClaimableTransfer(address _to, uint256 _value) {
-        transferInternal(msg.sender, _to, _value);
+        require(transferInternal(msg.sender, _to, _value));
     }
 }
