@@ -58,6 +58,7 @@ contract DaricoICO is Ownable {
 
     //Events
     event  Minted(address indexed to, uint256 valueDRC, uint256 valueDRX);
+    event Contribution(address _holder, uint256 valueETH, uint256 valueDRC, uint256 valueDRX);
 
     // Modifiers
     modifier duringICO() {
@@ -153,6 +154,7 @@ contract DaricoICO is Ownable {
         }
         if (drcMintedAmount > 0) {
             Minted(_addr, drcMintedAmount, drxMintedAmount);
+            Contribution(_addr, _eth, drcMintedAmount, drxMintedAmount);
             return true;
         }
         return false;
