@@ -21,7 +21,6 @@ contract GenesisToken is MintingERC20 {
 
     /* events */
     event ClaimedTokens(address _holder, uint256 _since, uint256 _till, uint256 _tokens);
-    event Debug(string _s, uint256 _v);
 
     /* constructor */
     function GenesisToken(
@@ -97,8 +96,6 @@ contract GenesisToken is MintingERC20 {
     internal returns (uint256)
     {
         uint256 blocks = _duration.div(_blockDuration);
-        Debug("blocks", blocks);
-        Debug("res", blocks.mul(_blockTokens).mul(_balance).div(maxSupply));
         return blocks.mul(_blockTokens).mul(_balance).div(maxSupply);
     }
 
@@ -112,39 +109,22 @@ contract GenesisToken is MintingERC20 {
     {
         uint256 totalTokens = 0;
 
-        Debug("--------------------------------------", 0);
-
         uint256 newCurrentTime = _lastClaimedAt;
         uint256 remainingSeconds = _currentTime.sub(_lastClaimedAt);
-
-        Debug("_lastClaimedAt", _lastClaimedAt);
-        Debug("_currentTime", _currentTime);
-        Debug("remainingSeconds", remainingSeconds);
 
         uint256 collectedTokensPerPeriod;
 
         for (uint256 i = 0; i < emissions.length; i++) {
-            Debug("------------", 0);
 
             TokenEmission storage emission = emissions[i];
-
-            Debug("emission.removed", emission.removed ? 1 : 0);
 
             if (emission.removed) {
                 continue;
             }
 
-            Debug("newCurrentTime", newCurrentTime);
-            Debug("emission.periodEndsAt", emission.periodEndsAt);
-            Debug("newCurrentTime < emission.periodEndsAt", newCurrentTime < emission.periodEndsAt ? 1 : 0);
-
             if (newCurrentTime < emission.periodEndsAt) {
-                Debug("newCurrentTime.add(remainingSeconds) > emission.periodEndsAt", newCurrentTime.add(remainingSeconds) > emission.periodEndsAt ? 1 : 0);
-
                 if (newCurrentTime.add(remainingSeconds) > emission.periodEndsAt) {
                     uint256 diff = emission.periodEndsAt.sub(newCurrentTime);
-
-                    Debug("diff", diff);
 
                     collectedTokensPerPeriod = getPeriodMinedTokens(
                         diff, _currentBalance,
@@ -166,10 +146,6 @@ contract GenesisToken is MintingERC20 {
                     remainingSeconds = 0;
                 }
 
-                Debug("collectedTokensPerPeriod", collectedTokensPerPeriod);
-                Debug("totalTokens", totalTokens);
-                Debug("newCurrentTime", newCurrentTime);
-                Debug("remainingSeconds", remainingSeconds);
             }
 
             if (remainingSeconds == 0) {

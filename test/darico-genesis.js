@@ -396,7 +396,7 @@ contract('DaricoGenesis', function (accounts) {
             })
             .then((result) => { createdAt = result.valueOf()})
             .then(function () {
-                return drx.testClaim(createdAt + 15, {from: accounts[1]});
+                return drx.testClaim(parseInt(createdAt) + 15, {from: accounts[1]});
             })
             // if here is an error  try to run test-file separetely (seems problem with time)
 
