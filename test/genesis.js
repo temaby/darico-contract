@@ -284,16 +284,14 @@ contract('Genesis', function(accounts) {
                 return instance.addTokenEmission(15, new BigNumber("1.242508562").mul(precision), forthPeriodEnds);
             })
             .then(Utils.receiptShouldSucceed)
+            .then(() => instance.emitTokensSince.call())
+            .then((result) => emitTokensSince = result.valueOf())
             // 3600 / 15 = 240 blocks
             // total generated tokens for 240 blocks = 2,385.61643832 * 10^18
             // user part of total supply = 0.0001388888889
             // total generated tokens for user = 2,385.61643832 * 10^18 * 0.0001388888889 = 3.313356165E17
-        var testPromise = new Promise(function(resolve, reject) {
-            setTimeout(function() {
-                resolve();
-            }, 15000);
-        });
-        testPromise.then(() => checkClaimedTokensAmount(instance, emitTokensSince, 0, 3600, 100, totalSupply, "331335616433333333"))
+        // checkClaimedTokensAmount(instance, offsetDate, lastClaimedAt, currentTime, currentBalance, totalSupply, expectedValue)
+            .then(() => checkClaimedTokensAmount(instance, emitTokensSince, 0, 3600, 100, totalSupply, "331335616433333333"))
             .then(() => checkClaimedTokensAmount(instance, emitTokensSince, 0, 3600, 0, totalSupply, "0"))
             .then(() => checkClaimedTokensAmount(instance, emitTokensSince, 3600, 3600, 100, totalSupply, "0"))
             // test for 100 days

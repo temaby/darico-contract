@@ -25,6 +25,17 @@ contract TestDaricoGenesisToken is DaricoGenesis {
         return claimInternal(_time, msg.sender, currentBalance, currentTotalSupply);
     }
 
+    function testSetBeneficiary(uint256 _time, address _beneficiary) public {
+        require(address(0) != _beneficiary);
+
+        // before the beneficiary is changed, claim the currently mined tokens
+        testClaim(_time);
+
+        // change beneficiary
+        beneficiaries[msg.sender] = _beneficiary;
+        BeneficiarySet(msg.sender, _beneficiary);
+    }
+
     function testTransfer(uint256 _time, address _to, uint256 _value) {
         claimableTransfer(_time, _to, _value);
     }

@@ -182,40 +182,39 @@ contract('DaricoGenesis', function (accounts) {
             // })
             .then(function () {
 
-                console.log(createdAt);
-                console.log(emitTokensSince);
+                console.log('createdAt',createdAt);
+                console.log('emitTokensSince',emitTokensSince);
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
-            var testPromise = new Promise(function(resolve, reject) {
-                setTimeout(function() {
-                    resolve();
-                }, 15000);
-            });
-            testPromise.then(function () {
-                return drx.testClaim(parseInt(new Date().getTime() / 1000), {from: accounts[1]});
+            .then(function () {
+                console.log('createdAt+15',15 + parseInt(createdAt));
+                return drx.testClaim(15 + parseInt(createdAt), {from: accounts[1]});
             })
             .then(Utils.receiptShouldSucceed)
             // .then(() => drx.getBeneficiary.call(accounts[1]))
             // .then((result) => console.log(result.valueOf()))
             .then(() => console.log(accounts[1]))
             .then(() => Utils.balanceShouldEqualTo(drx, accounts[1], new BigNumber(1).valueOf()))
-            // 9.940068493 * 10 ** 18 +  new BigNumber(1000).mul(precision) =1009940068493000000000
-            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1009940068493000000000))
+
+            //10k drx = (X) / 78k * 10k drc
+            //   uint256 blocks = _duration.div(_blockDuration);
+                // return 9.940068493 * 10 ** 18 *(1)/78000;
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1000000127436775551282))
             .then(() => drx.setBeneficiary(accounts[3],{from: accounts[1]}))
             .then(Utils.receiptShouldSucceed)
             // .then(() => drx.getBeneficiary.call(accounts[1]))
             // .then((result) => console.log('a3?',result.valueOf()))
             .then(() => console.log('a1',accounts[1]))
-        var testPromise = new Promise(function(resolve, reject) {
-            setTimeout(function() {
-                resolve();
-            }, 35000);
-        });
-        testPromise.then(function () {
-                return drx.testClaim(parseInt(new Date().getTime() / 1000), {from: accounts[1]});
+
+        // 9.940068493 * 10 ** 18 +  new BigNumber(1000).mul(precision) =1009940068493000000000
+        //10k drx = (X) / 78k * 10k drc
+        //   uint256 blocks = _duration.div(_blockDuration);
+        // return 9.940068493 * 1000000000000000000 *(1)/78000;
+        .then(function () {
+                return drx.testClaim(35 + parseInt(createdAt), {from: accounts[1]});
             })
-            .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 9940068493000000000))
-            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1009940068493000000000))
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 127436775551282))
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1000000127436775551282))
     });
     it("NON DRX holder should  be able to set the beneficiary", function () {
         return createAllContracts(accounts)
@@ -283,9 +282,9 @@ contract('DaricoGenesis', function (accounts) {
                 return ico.sendTransaction({from: accounts[1], value: new BigNumber(10).mul(precision).valueOf()});
             })
             .then(()=>{
-                createdAt = parseInt(new Date().getTime() / 1000);
-                Utils.receiptShouldSucceed
+                return drx.lastClaims.call(accounts[1]);
             })
+            .then((result) => { createdAt = result.valueOf() })
             .then(() => Utils.balanceShouldEqualTo(drx, accounts[1], new BigNumber(1).valueOf()))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
 
@@ -293,14 +292,8 @@ contract('DaricoGenesis', function (accounts) {
                 console.log(createdAt);
                 console.log(emitTokensSince);
             })
-            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
-            var testPromise = new Promise(function(resolve, reject) {
-                setTimeout(function() {
-                    resolve();
-                }, 15000);
-            });
-            testPromise.then(function () {
-                return drx.testClaim(parseInt(new Date().getTime() / 1000), {from: accounts[1]});
+           .then(function () {
+                return drx.testClaim(parseInt(createdAt)+15, {from: accounts[1]});
             })
             .then(Utils.receiptShouldSucceed)
             // .then(() => drx.getBeneficiary.call(accounts[1]))
@@ -308,7 +301,7 @@ contract('DaricoGenesis', function (accounts) {
             .then(() => console.log(accounts[1]))
             .then(() => Utils.balanceShouldEqualTo(drx, accounts[1], new BigNumber(1).valueOf()))
             // 9.940068493 * 10 ** 18 +  new BigNumber(1000).mul(precision) =1009940068493000000000
-            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1009940068493000000000))
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1000000127436775551282))
 
     });
 
@@ -373,9 +366,9 @@ contract('DaricoGenesis', function (accounts) {
                 return ico.sendTransaction({from: accounts[1], value: new BigNumber(10).mul(precision).valueOf()});
             })
             .then(()=>{
-                createdAt = parseInt(new Date().getTime() / 1000);
-            Utils.receiptShouldSucceed
-        })
+                return drx.lastClaims.call(accounts[1]);
+            })
+            .then((result) => { createdAt = result.valueOf() })
             .then(() => Utils.balanceShouldEqualTo(drx, accounts[1], new BigNumber(1).valueOf()))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
 
@@ -384,35 +377,31 @@ contract('DaricoGenesis', function (accounts) {
                 console.log('emit',emitTokensSince);
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
-            // .then(()=> Utils.timeout(15))
-            .then(()=>{
-
-            var now = parseInt(new Date().getTime() / 1000);
-            console.log('now',now);
-            })
-            var testPromise = new Promise(function(resolve, reject) {
-                setTimeout(function() {
-                    resolve();
-                }, 15000);
-            });
-            testPromise.then(
+            .then(
                 ()=>{
                 console.log('after15',parseInt(new Date().getTime() / 1000));
-                drx.setBeneficiary(accounts[3],{from: accounts[1]})
+                drx.testSetBeneficiary(parseInt(createdAt)+15, accounts[3],{from: accounts[1]})
                 }
             )
-            .then(() => drx.setBeneficiary(accounts[2],{from: accounts[1]}))
-            .then(() => drx.setBeneficiary(accounts[3],{from: accounts[1]}))
+            .then(() => drx.testSetBeneficiary(parseInt(createdAt)+15,accounts[2],{from: accounts[1]}))
+            .then(() => drx.testSetBeneficiary(parseInt(createdAt)+15,accounts[3],{from: accounts[1]}))
             .then(Utils.receiptShouldSucceed)
-            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1009940068493000000000))
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1000000127436775551282))
             // .then(() => drx.getBeneficiary.call(accounts[1]))
             // .then((result) => console.log('a3?',result.valueOf()))
             .then(() => console.log('a1',accounts[1]))
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 0))
+            .then(()=>{
+                return drx.lastClaims.call(accounts[1]);
+            })
+            .then((result) => { createdAt = result.valueOf()})
             .then(function () {
-                return drx.testClaim(createdAt + 40, {from: accounts[1]});
+                return drx.testClaim(createdAt + 15, {from: accounts[1]});
             })
             // if here is an error  try to run test-file separetely (seems problem with time)
-            .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 9940068493000000000))
-            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1009940068493000000000))
+
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 127436775551282))
+
+            .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1000000127436775551282))
     });
 });
