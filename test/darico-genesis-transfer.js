@@ -92,9 +92,15 @@ contract('DaricoGenesis Test Transfering', function (accounts) {
                 console.log(emitTokensSince);
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(5000).mul(precision).valueOf()))
-            .then(function () {
-                return drx.testClaim(createdAt + 15, {from: accounts[1]});
-            })
+            .then(() => console.log('a1',accounts[1]))
+            var testPromise = new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    resolve();
+                }, 35000);
+            });
+            testPromise.then(function () {
+                    return drx.testClaim(new Date().getTime() / 1000, {from: accounts[1]});
+                })
             .then(Utils.receiptShouldSucceed)
             // .then(() => drx.getBeneficiary.call(accounts[1]))
             // .then((result) => console.log(result.valueOf()))
@@ -107,13 +113,23 @@ contract('DaricoGenesis Test Transfering', function (accounts) {
             // // .then(() => drx.getBeneficiary.call(accounts[1]))
             // // .then((result) => console.log('a3?',result.valueOf()))
             .then(() => console.log('a1',accounts[1]))
-            .then(function () {
-                return drx.testClaim(createdAt + 35, {from: accounts[1]});
+            var testPromise = new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    resolve();
+                }, 35000);
+            });
+            testPromise.then(function () {
+                return drx.testClaim(parseInt(new Date().getTime() / 1000), {from: accounts[1]});
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 9940068493000000000))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 5009940068493000000000))
-            .then(function() {
-                return drx.testTransfer(createdAt + 50, accounts[4], new BigNumber(2), {from: accounts[1]});
+            var testPromise = new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    resolve();
+                }, 50000);
+            });
+            testPromise.then(function () {
+                return drx.testClaim(parseInt(new Date().getTime() / 1000), {from: accounts[1]});
             })
             .then(Utils.receiptShouldSucceed)
             .then(() => Utils.balanceShouldEqualTo(drx, accounts[4], new BigNumber(2)))
@@ -121,28 +137,51 @@ contract('DaricoGenesis Test Transfering', function (accounts) {
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 5009940068493000000000))
             // (15/15 * 9940068493000000000 * 5)/5
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 19880136986000000000))
-            .then(function () {
-                return drx.testClaim(createdAt + 65, {from: accounts[1]});
+            var testPromise = new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    resolve();
+                }, 65000);
+            });
+            testPromise.then(function () {
+                return drx.testClaim(parseInt(new Date().getTime() / 1000), {from: accounts[1]});
             })
+            // .then(function () {
+            //     return drx.testClaim(createdAt + 65, {from: accounts[1]});
+            // })
             .then(Utils.receiptShouldSucceed)
             // ((diff / emission.blockDuration) * emission.blockTokens * currentBalance) / totalSupply;
             // (65/15 * 9940068493000000000 * 3)/5
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], new BigNumber(25844178081800000000)))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[4], 0))
-            .then(function () {
-                return drx.testClaim(createdAt + 65, {from: accounts[4]});
+            var testPromise = new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    resolve();
+                }, 65000);
+            });
+            testPromise.then(function () {
+                return drx.testClaim(parseInt(new Date().getTime() / 1000), {from: accounts[4]});
             })
             .then(Utils.receiptShouldSucceed)
             // (15/15 * 9940068493000000000 * 2)/5
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[4], new BigNumber('3976027397200000000').valueOf()))
-            .then(function () {
-                return drx.testClaim(createdAt + 35, {from: accounts[4]});
+            var testPromise = new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    resolve();
+                }, 35000);
+            });
+            testPromise.then(function () {
+                return drx.testClaim(parseInt(new Date().getTime() / 1000), {from: accounts[4]});
             })
             .then(Utils.receiptShouldSucceed)
             // (65/15 * 9940068493000000000 * 3)/5
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], new BigNumber(25844178081800000000)))
-            .then(function () {
-                return drx.testClaim(createdAt + 35, {from: accounts[4]});
+            var testPromise = new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    resolve();
+                }, 35000);
+            });
+            testPromise.then(function () {
+                return drx.testClaim(parseInt(new Date().getTime() / 1000), {from: accounts[4]});
             })
             .then(Utils.receiptShouldSucceed)
             // (65/15 * 9940068493000000000 * 2)/5

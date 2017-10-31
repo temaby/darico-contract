@@ -186,8 +186,13 @@ contract('DaricoGenesis', function (accounts) {
                 console.log(emitTokensSince);
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
-            .then(function () {
-                return drx.testClaim(createdAt + 15, {from: accounts[1]});
+            var testPromise = new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    resolve();
+                }, 15000);
+            });
+            testPromise.then(function () {
+                return drx.testClaim(parseInt(new Date().getTime() / 1000), {from: accounts[1]});
             })
             .then(Utils.receiptShouldSucceed)
             // .then(() => drx.getBeneficiary.call(accounts[1]))
@@ -201,8 +206,13 @@ contract('DaricoGenesis', function (accounts) {
             // .then(() => drx.getBeneficiary.call(accounts[1]))
             // .then((result) => console.log('a3?',result.valueOf()))
             .then(() => console.log('a1',accounts[1]))
-            .then(function () {
-                return drx.testClaim(createdAt + 35, {from: accounts[1]});
+        var testPromise = new Promise(function(resolve, reject) {
+            setTimeout(function() {
+                resolve();
+            }, 35000);
+        });
+        testPromise.then(function () {
+                return drx.testClaim(parseInt(new Date().getTime() / 1000), {from: accounts[1]});
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 9940068493000000000))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1009940068493000000000))
@@ -284,8 +294,13 @@ contract('DaricoGenesis', function (accounts) {
                 console.log(emitTokensSince);
             })
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
-            .then(function () {
-                return drx.testClaim(createdAt + 16, {from: accounts[1]});
+            var testPromise = new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    resolve();
+                }, 15000);
+            });
+            testPromise.then(function () {
+                return drx.testClaim(parseInt(new Date().getTime() / 1000), {from: accounts[1]});
             })
             .then(Utils.receiptShouldSucceed)
             // .then(() => drx.getBeneficiary.call(accounts[1]))
