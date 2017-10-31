@@ -116,8 +116,8 @@ contract('DaricoGenesis', function (accounts) {
 
     });
     it("DRX holder should be able to set the beneficiary", function () {
-        var drx;
-        var createdAt;
+        let drx, drc;
+        let createdAt;
         team = accounts[8];
         return Darico.new(
             0, // uint256 _initialSupply,
@@ -172,9 +172,9 @@ contract('DaricoGenesis', function (accounts) {
                 return ico.sendTransaction({from: accounts[1], value: new BigNumber(10).mul(precision).valueOf()});
             })
             .then(()=>{
-                createdAt = parseInt(new Date().getTime() / 1000);
-                Utils.receiptShouldSucceed
+                return drx.lastClaims.call(accounts[1]);
             })
+            .then((result) => { createdAt = result.valueOf() })
             .then(() => Utils.balanceShouldEqualTo(drx, accounts[1], new BigNumber(1).valueOf()))
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], new BigNumber(1000).mul(precision).valueOf()))
             // .then(function () {
