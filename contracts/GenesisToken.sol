@@ -21,6 +21,7 @@ contract GenesisToken is MintingERC20 {
 
     /* events */
     event ClaimedTokens(address _holder, uint256 _since, uint256 _till, uint256 _tokens);
+    event Debug(string _s, uint256 _v);
 
     /* constructor */
     function GenesisToken(
@@ -96,7 +97,8 @@ contract GenesisToken is MintingERC20 {
     internal returns (uint256)
     {
         uint256 blocks = _duration.div(_blockDuration);
-
+        Debug('blocks', blocks);
+        Debug('res', blocks.mul(_blockTokens).mul(_balance).div(maxSupply));
         return blocks.mul(_blockTokens).mul(_balance).div(maxSupply);
     }
 

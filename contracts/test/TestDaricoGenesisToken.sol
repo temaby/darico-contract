@@ -22,6 +22,7 @@ contract TestDaricoGenesisToken is DaricoGenesis {
     function testClaim(uint256 _time) returns (uint256) {
         uint256 currentBalance = balanceOf(msg.sender);
         uint256 currentTotalSupply = totalSupply();
+
         return claimInternal(_time, msg.sender, currentBalance, currentTotalSupply);
     }
 
