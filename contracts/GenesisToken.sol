@@ -9,7 +9,7 @@ contract GenesisToken is MintingERC20 {
 
     TokenEmission[] public emissions;
 
-    mapping(address => uint256) internal lastClaims;
+    mapping(address => uint256) public lastClaims;
 
     /* structs */
     struct TokenEmission {
