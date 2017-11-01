@@ -96,7 +96,6 @@ contract GenesisToken is MintingERC20 {
     internal returns (uint256)
     {
         uint256 blocks = _duration.div(_blockDuration);
-
         return blocks.mul(_blockTokens).mul(_balance).div(maxSupply);
     }
 
@@ -116,6 +115,7 @@ contract GenesisToken is MintingERC20 {
         uint256 collectedTokensPerPeriod;
 
         for (uint256 i = 0; i < emissions.length; i++) {
+
             TokenEmission storage emission = emissions[i];
 
             if (emission.removed) {
@@ -145,6 +145,7 @@ contract GenesisToken is MintingERC20 {
                     newCurrentTime += remainingSeconds;
                     remainingSeconds = 0;
                 }
+
             }
 
             if (remainingSeconds == 0) {
