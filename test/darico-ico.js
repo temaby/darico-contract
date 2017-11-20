@@ -113,7 +113,8 @@ contract('DaricoICO', function (accounts) {
                     drx.address, // address _drx,
                     drc.address, // address _drc,
                     _icoSince, // uint256 _icoSince,
-                    inFiveMinutes // uint256 _icoTill
+                    inFiveMinutes, // uint256 _icoTill
+                    accounts[7]
                 );
             })
             .then((_result) => ico = _result)
@@ -180,7 +181,8 @@ contract('DaricoICO', function (accounts) {
                     // drc.totalSupply, // uint256 _drcSoldBefore,
                     // drx.totalSupply, // uint256 _drxSoldBefore,
                     _icoSince, // uint256 _icoSince,
-                    inFiveMinutes // uint256 _icoTill
+                    inFiveMinutes, // uint256 _icoTill
+                    accounts[7]
                 );
             })
             .then((_result) => ico = _result)
@@ -258,7 +260,8 @@ contract('DaricoICO', function (accounts) {
                 drx.address, // address _drx,
                 drc.address, // address _drc,
                 _icoSince, // uint256 _icoSince,
-                inFiveMinutes // uint256 _icoTill
+                inFiveMinutes, // uint256 _icoTill
+                accounts[7]
             );
         })
         .then((_result) => ico = _result)
@@ -349,7 +352,8 @@ contract('DaricoICO', function (accounts) {
                     drx.address, // address _drx,
                     drc.address, // address _drc,
                     _icoSince, // uint256 _icoSince,
-                    inFiveMinutes // uint256 _icoTill
+                    inFiveMinutes, // uint256 _icoTill
+                    accounts[7]
                 );
             })
             .then((_result) => ico = _result)
@@ -450,7 +454,8 @@ contract('DaricoICO', function (accounts) {
                     drx.address, // address _drx,
                     drc.address, // address _drc,
                     _icoSince, // uint256 _icoSince,
-                    inFiveMinutes // uint256 _icoTill
+                    inFiveMinutes, // uint256 _icoTill
+                    accounts[7]
                 );
             })
             .then((_result) => ico = _result)
@@ -531,7 +536,8 @@ contract('DaricoICO', function (accounts) {
                     drx.address, // address _drx,
                     drc.address, // address _drc,
                     _icoSince, // uint256 _icoSince,
-                    inFiveMinutes // uint256 _icoTill
+                    inFiveMinutes, // uint256 _icoTill
+                    accounts[7]
                 );
             })
             .then((_result) => ico = _result)

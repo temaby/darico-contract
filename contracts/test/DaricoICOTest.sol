@@ -11,8 +11,10 @@ contract DaricoICOTest is DaricoICO {
     address _drx,
     address _drc,
     uint256 _icoSince,
-    uint256 _icoTill)
-    DaricoICO(_team, _drx, _drc, _icoSince, _icoTill)
+    uint256 _icoTill,
+    address _etherHolder
+    )
+    DaricoICO(_team, _drx, _drc, _icoSince, _icoTill, _etherHolder)
     {
 
     }

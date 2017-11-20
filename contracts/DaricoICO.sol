@@ -38,12 +38,13 @@ contract DaricoICO is Ownable {
     uint256 public ethersContributed;
     uint256 public drcSold;
     uint256 public drxSold;
-    uint8 public currentPhase;
 
     Darico public drc;
     DaricoGenesis public drx;
 
     address public team;
+    // address where funds are collected
+    address public etherHolder;
 
     bool public icoOpen = true;
     bool public icoFinished = false;
@@ -77,7 +78,8 @@ contract DaricoICO is Ownable {
         address _drx,
         address _drc,
         uint256 _icoSince,
-        uint256 _icoTill
+        uint256 _icoTill,
+        address _etherHolder
     )
     {
         team = _team;
@@ -94,6 +96,7 @@ contract DaricoICO is Ownable {
 
         icoSince = _icoSince;
         icoTill = _icoTill;
+        etherHolder = _etherHolder;
     }
 
     function() external payable duringICO nonZero {
@@ -115,6 +118,16 @@ contract DaricoICO is Ownable {
 
     function pauseICO() public onlyOwner {
         icoOpen = false;
+    }
+
+    function setEtherHolder(address _etherHolder) public onlyOwner {
+        require(_etherHolder != address(0));
+        etherHolder = _etherHolder;
+    }
+
+    function transferEthers() public onlyOwner {
+        require(etherHolder != address(0));
+        etherHolder.transfer(this.balance);
     }
 
     function internalFinishICO() internal {
