@@ -80,6 +80,25 @@ contract DaricoGenesis is GenesisToken {
         return minted;
     }
 
+    function calculateEmissionTokensForNow(address _address) public returns (uint256 tokens) {
+        if (block.timestamp < emitTokensSince) {
+            return 0;
+        }
+        if (balanceOf(_address) == 0) {
+            lastClaims[_address] = block.timestamp;
+            return 0;
+        }
+        uint256 lastClaimAt = lastClaims[_address];
+        if (lastClaimAt == 0) {
+            lastClaims[_address] = emitTokensSince;
+            lastClaimAt = emitTokensSince;
+        }
+        if (lastClaimAt >= block.timestamp) {
+            return 0;
+        }
+        return calculateEmissionTokens(lastClaimAt, block.timestamp, balanceOf(_address), totalSupply());
+    }
+
     function tokensClaimedHook(address _holder, uint256 _since, uint256 _till, uint256 _tokens) internal {
         if (address(drc) != address(0) && _tokens > 0) {
             uint256 mintedAmount = drc.mint(getBeneficiary(_holder), _tokens);

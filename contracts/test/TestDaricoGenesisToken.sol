@@ -6,10 +6,12 @@ import "../DaricoGenesis.sol";
 contract TestDaricoGenesisToken is DaricoGenesis {
     uint256 public createdAt;
 
-    function TestDaricoGenesisToken(uint256 _emitSince,
+    function TestDaricoGenesisToken(
+    uint256 _emitSince,
     bool _initEmission,
     uint256 _initialSupply,
-    address _drc)
+    address _drc
+    )
     DaricoGenesis(_emitSince, _initEmission, _initialSupply, _drc)
     {
 //        standard = "Test Genesis Token 0.1";

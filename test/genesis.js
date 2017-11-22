@@ -446,5 +446,103 @@ contract('Genesis', function(accounts) {
             .then(() => checkTotalSupply(instance, createdAt, 86400, new BigNumber(15000000 + 1440).mul(precision)))
             .then(() => checkTotalSupply(instance, createdAt, 150123, "1.500250205e+25"));
     });
+
+    it("test reclaiming tokens before last claim", function() {
+        var instance;
+
+        var genesisToken;
+        var claimableToken;
+
+        var createdAt;
+
+        return TestGenesisToken.new()
+            .then(function (_instance) {
+                genesisToken = _instance;
+
+                return genesisToken.createdAt.call();
+            })
+            .then(function (result) {
+                createdAt = parseInt(result.valueOf());
+            })
+            .then(function () {
+                // emissions.push(TokenEmission(60, 10 ** 18, 2**255 - now, false));
+                return genesisToken.addTokenEmission(60, new BigNumber("1").mul(precision), 2 ** 255 - createdAt);
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(function () {
+                return TestClaimableToken.new(genesisToken.address);
+            })
+            .then(function (_instance) {
+                claimableToken = _instance;
+
+                return genesisToken.setClaimableToken(claimableToken.address);
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(function () {
+                return genesisToken.nonClaimableTransfer(accounts[1], new BigNumber(1000).valueOf());
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[1], new BigNumber(1000).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[1], new BigNumber(0).valueOf()))
+            .then(function () {
+                return genesisToken.testClaim(createdAt + 3600, {from: accounts[1]});
+            })
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[1], new BigNumber(1000).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[1], "83333333333333333"))
+            .then(function () {
+                return genesisToken.testClaim(createdAt - 3000, {from: accounts[1]});
+            })
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[1], new BigNumber(1000).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[1], "83333333333333333"));
+    });
+
+    it("test reclaiming tokens in short time after last claim", function() {
+        var instance;
+
+        var genesisToken;
+        var claimableToken;
+
+        var createdAt;
+
+        return TestGenesisToken.new()
+            .then(function (_instance) {
+                genesisToken = _instance;
+
+                return genesisToken.createdAt.call();
+            })
+            .then(function (result) {
+                createdAt = parseInt(result.valueOf());
+            })
+            .then(function () {
+                // emissions.push(TokenEmission(60, 10 ** 18, 2**255 - now, false));
+                return genesisToken.addTokenEmission(60, new BigNumber("1").mul(precision), 2 ** 255 - createdAt);
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(function () {
+                return TestClaimableToken.new(genesisToken.address);
+            })
+            .then(function (_instance) {
+                claimableToken = _instance;
+
+                return genesisToken.setClaimableToken(claimableToken.address);
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(function () {
+                return genesisToken.nonClaimableTransfer(accounts[1], new BigNumber(1000).valueOf());
+            })
+            .then(Utils.receiptShouldSucceed)
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[1], new BigNumber(1000).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[1], new BigNumber(0).valueOf()))
+            .then(function () {
+                return genesisToken.testClaim(createdAt + 3600, {from: accounts[1]});
+            })
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[1], new BigNumber(1000).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[1], "83333333333333333"))
+            .then(function () {
+                return genesisToken.testClaim(createdAt + 3600, {from: accounts[1]});
+            })
+            .then(() => Utils.balanceShouldEqualTo(genesisToken, accounts[1], new BigNumber(1000).valueOf()))
+            .then(() => Utils.balanceShouldEqualTo(claimableToken, accounts[1], "83333333333333333"));
+    });
 });
 

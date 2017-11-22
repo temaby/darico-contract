@@ -1,9 +1,9 @@
 let DaricoGenesis = artifacts.require("./DaricoGenesis.sol");
 let DaricoBounty = artifacts.require("./DaricoBounty.sol");
-let TestICO = artifacts.require("./test/DaricoICOTest.sol");
+let TestICO = artifacts.require("./test/ICOTest.sol");
 let TestDaricoGenesis = artifacts.require("./test/TestDaricoGenesisToken.sol");
 let Darico = artifacts.require("./Darico.sol");
-let DaricoICO = artifacts.require("./DaricoICO.sol");
+let ICO = artifacts.require("./ICO.sol");
 let Utils = require("./utils");
 
 let BigNumber = require('bignumber.js');
@@ -13,7 +13,9 @@ let team;
 let drx, drc, ico, bounty;
 var createdAt;
 let emitTokensSince = parseInt(new Date().getTime() / 1000);
-
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 function createAllContracts(accounts) {
     "use strict";
     team = accounts[8];
@@ -53,15 +55,15 @@ function createAllContracts(accounts) {
         .then(() => {
             let _icoSince = parseInt(new Date().getTime() / 1000 - 200);
             let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 300);
-            return TestICO.new(
-                // bounty.address,// address _bounty,
-                team, // address _team,
-                drx.address, // address _drx,
-                drc.address, // address _drc,
-                _icoSince, // uint256 _icoSince,
-                inFiveMinutes, // uint256 _icoTill
-                accounts[7],
-            );
+            return ICO.new(
+                accounts[7],// _etherHolder,
+                drc.address, // _drc,
+                drx.address, // _drx,
+                accounts[6],// _team,
+                _icoSince,// _startTime,
+                inFiveMinutes, //_endTime,
+                new BigNumber('57000000').mul(precision)
+            )
         })
         .then((_result) => ico = _result)
         .then(() => drx.addMinter(ico.address))
@@ -154,15 +156,15 @@ contract('DaricoGenesis', function (accounts) {
             .then(() => {
                 let _icoSince = parseInt(new Date().getTime() / 1000 - 200);
                 let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 300);
-                return TestICO.new(
-                    // bounty.address,// address _bounty,
-                    team, // address _team,
-                    drx.address, // address _drx,
-                    drc.address, // address _drc,
-                    _icoSince, // uint256 _icoSince,
-                    inFiveMinutes, // uint256 _icoTill
-                    accounts[7]
-                );
+                return ICO.new(
+                    accounts[7],// _etherHolder,
+                    drc.address, // _drc,
+                    drx.address, // _drx,
+                    accounts[6],// _team,
+                    _icoSince,// _startTime,
+                    inFiveMinutes, //_endTime,
+                    new BigNumber('57000000').mul(precision)
+                )
             })
             .then((_result) => ico = _result)
             .then(() => drx.addMinter(ico.address))
@@ -265,15 +267,15 @@ contract('DaricoGenesis', function (accounts) {
             .then(() => {
                 let _icoSince = parseInt(new Date().getTime() / 1000 - 200);
                 let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 300);
-                return TestICO.new(
-                    // bounty.address,// address _bounty,
-                    team, // address _team,
-                    drx.address, // address _drx,
-                    drc.address, // address _drc,
-                    _icoSince, // uint256 _icoSince,
-                    inFiveMinutes, // uint256 _icoTill
-                    accounts[7]
-                );
+                return ICO.new(
+                    accounts[7],// _etherHolder,
+                    drc.address, // _drc,
+                    drx.address, // _drx,
+                    accounts[6],// _team,
+                    _icoSince,// _startTime,
+                    inFiveMinutes, //_endTime,
+                    new BigNumber('57000000').mul(precision)
+                )
             })
             .then((_result) => ico = _result)
             .then(() => drx.addMinter(ico.address))
@@ -350,15 +352,15 @@ contract('DaricoGenesis', function (accounts) {
             .then(() => {
                 let _icoSince = parseInt(new Date().getTime() / 1000 - 200);
                 let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 300);
-                return TestICO.new(
-                    // bounty.address,// address _bounty,
-                    team, // address _team,
-                    drx.address, // address _drx,
-                    drc.address, // address _drc,
-                    _icoSince, // uint256 _icoSince,
-                    inFiveMinutes, // uint256 _icoTill
-                    accounts[7]
-                );
+                return ICO.new(
+                    accounts[7],// _etherHolder,
+                    drc.address, // _drc,
+                    drx.address, // _drx,
+                    accounts[6],// _team,
+                    _icoSince,// _startTime,
+                    inFiveMinutes, //_endTime,
+                    new BigNumber('57000000').mul(precision)
+                )
             })
             .then((_result) => ico = _result)
             .then(() => drx.addMinter(ico.address))
@@ -407,5 +409,124 @@ contract('DaricoGenesis', function (accounts) {
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[3], 127436775551282))
 
             .then(() => Utils.balanceShouldEqualTo(drc, accounts[1], 1000000127436775551282))
+    });
+
+    it("check calculateEmissionTokensForNow", async function () {
+        let claimableToken, createdAt, team;
+
+        team = accounts[8];
+       let drc = await Darico.new(
+            0, // uint256 _initialSupply,
+            new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
+            18, // uint8 _precision,
+            "Darico", // string _tokenName,
+            "DRC" // string _symbol
+        )
+       let drx = await TestDaricoGenesis.new(
+            parseInt(new Date().getTime() / 1000) - 32,    // uint256 emitSince,
+            true, // initGeneration
+            0, // initialSupply
+            drc.address, //drcAddress
+        )
+        await drx.mint(accounts[0], new BigNumber(10))
+        await timeout(16000)
+        .then(() => Utils.balanceShouldEqualTo(drx, accounts[0], 10))
+        .then(() => drx.name.call())
+        .then((_result) => assert.equal(_result.valueOf(), "Darico Genesis"))
+
+        .then(() => {return drx.calculateEmissionTokensForNow(accounts[0])})
+        .then(() => {return drx.calculateEmissionTokensForNow.call(accounts[0])})
+        .then((result) => {
+           console.log('emitSince',parseInt(new Date().getTime() / 1000) - 32);
+            //blocks.mul(_blockTokens).mul(_balance).div(maxSupply);
+            //  1*9940068493000000000*10/78000= 1274367755512820.5128205128205128
+           // 15*10/78000
+            assert.equal(result.valueOf(), new BigNumber(1274367755512820).valueOf(), 'collected amount is not equal')
+        })
+    });
+
+    it("check calculateEmissionTokensForNow block.timestamp < emitTokensSince", async function () {
+        let claimableToken, createdAt, team;
+
+        team = accounts[8];
+        let drc = await Darico.new(
+            0, // uint256 _initialSupply,
+            new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
+            18, // uint8 _precision,
+            "Darico", // string _tokenName,
+            "DRC" // string _symbol
+        )
+        let drx = await TestDaricoGenesis.new(
+            parseInt(new Date().getTime() / 1000) + 32,    // uint256 emitSince,
+            true, // initGeneration
+            0, // initialSupply
+            drc.address, //drcAddress
+        )
+        await drx.mint(accounts[0], new BigNumber(10))
+            .then(() => Utils.balanceShouldEqualTo(drx, accounts[0], 10))
+            .then(() => drx.name.call())
+            .then((_result) => assert.equal(_result.valueOf(), "Darico Genesis"))
+
+            .then(() => {return drx.calculateEmissionTokensForNow(accounts[0])})
+            .then(() => {return drx.calculateEmissionTokensForNow.call(accounts[0])})
+            .then((result) => {
+                assert.equal(result.valueOf(), new BigNumber(0).valueOf(), 'collected amount is not equal')
+            })
+    });
+
+    it("check calculateEmissionTokensForNow balanceOf(_address) == 0", async function () {
+        let claimableToken, createdAt, team;
+
+        team = accounts[8];
+        let drc = await Darico.new(
+            0, // uint256 _initialSupply,
+            new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
+            18, // uint8 _precision,
+            "Darico", // string _tokenName,
+            "DRC" // string _symbol
+        )
+        let drx = await TestDaricoGenesis.new(
+            parseInt(new Date().getTime() / 1000) + 32,    // uint256 emitSince,
+            true, // initGeneration
+            0, // initialSupply
+            drc.address, //drcAddress
+        )
+            await Utils.balanceShouldEqualTo(drx, accounts[0], 0)
+            .then(() => drx.name.call())
+            .then((_result) => assert.equal(_result.valueOf(), "Darico Genesis"))
+
+            .then(() => {return drx.calculateEmissionTokensForNow(accounts[0])})
+            .then(() => {return drx.calculateEmissionTokensForNow.call(accounts[0])})
+            .then((result) => {
+                assert.equal(result.valueOf(), new BigNumber(0).valueOf(), 'collected amount is not equal')
+            })
+    });
+    it("check calculateEmissionTokensForNow lastClaimAt >= block.timestamp", async function () {
+        let claimableToken, createdAt, team;
+
+        team = accounts[8];
+        let drc = await Darico.new(
+            0, // uint256 _initialSupply,
+            new BigNumber(78000000).mul(drcPrecision), // uint256 _maxSupply,
+            18, // uint8 _precision,
+            "Darico", // string _tokenName,
+            "DRC" // string _symbol
+        )
+        let drx = await TestDaricoGenesis.new(
+            parseInt(new Date().getTime() / 1000) - 32,    // uint256 emitSince,
+            true, // initGeneration
+            0, // initialSupply
+            drc.address, //drcAddress
+        )
+        await drx.mint(accounts[0], new BigNumber(10))
+            .then(() => Utils.balanceShouldEqualTo(drx, accounts[0], 10))
+            .then(() => drx.name.call())
+            .then((_result) => assert.equal(_result.valueOf(), "Darico Genesis"))
+
+            .then(() => {return drx.calculateEmissionTokensForNow(accounts[0])})
+            .then(() => {return drx.calculateEmissionTokensForNow.call(accounts[0])})
+            .then((result) => {
+                assert.equal(result.valueOf(), new BigNumber(0).valueOf(), 'collected amount is not equal')
+            })
     });
 });
