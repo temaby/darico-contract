@@ -1,9 +1,7 @@
 let DaricoGenesis = artifacts.require("./DaricoGenesis.sol");
 let DaricoBounty = artifacts.require("./DaricoBounty.sol");
 let TestGenesis = artifacts.require("./test/TestGenesisToken.sol");
-let TestICO = artifacts.require("./test/DaricoICOTest.sol");
 let Darico = artifacts.require("./Darico.sol");
-let DaricoICO = artifacts.require("./DaricoICO.sol");
 let Utils = require("./utils");
 
 let BigNumber = require('bignumber.js');
@@ -47,19 +45,7 @@ contract('DaricoBounty', function (accounts) {
                 )
             })
             .then((_result) => bounty = _result)
-            // deploying the ico smart contract
-            .then(() => {
-                let _icoSince = parseInt(new Date().getTime() / 1000 - 200);
-                let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 300);
-                return TestICO.new(
-                    team, // address _team,
-                    drx.address, // address _drx,
-                    drc.address, // address _drc,
-                    _icoSince, // uint256 _icoSince,
-                    inFiveMinutes // uint256 _icoTill
-                );
-            })
-            .then((_result) => ico = _result)
+
             .then(() => bounty.drc.call())
             .then((result) => assert.equal(result.valueOf(), drc.address, "drc is not equal"))
             .then(() => bounty.mint(accounts[2], new BigNumber(3).mul(drcPrecision)))

@@ -70,6 +70,10 @@ contract ERC20 is Ownable {
     }
 
     /* public methods */
+    function setLocked(bool _locked) public onlyOwner {
+        locked = _locked;
+    }
+
     function transfer(address _to, uint256 _value) public onlyPayloadSize(2) returns (bool) {
         require(locked == false);
     

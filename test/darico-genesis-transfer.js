@@ -1,9 +1,8 @@
 let DaricoGenesis = artifacts.require("./DaricoGenesis.sol");
 let DaricoBounty = artifacts.require("./DaricoBounty.sol");
-let TestICO = artifacts.require("./test/DaricoICOTest.sol");
 let TestDaricoGenesis = artifacts.require("./test/TestDaricoGenesisToken.sol");
 let Darico = artifacts.require("./Darico.sol");
-let DaricoICO = artifacts.require("./DaricoICO.sol");
+let ICO = artifacts.require("./ICO.sol");
 let Utils = require("./utils");
 
 let BigNumber = require('bignumber.js');
@@ -51,14 +50,15 @@ function createAllContracts(accounts) {
         .then(() => {
             let _icoSince = parseInt(new Date().getTime() / 1000 - 200);
             let inFiveMinutes = parseInt(new Date().getTime() / 1000 + 300);
-            return TestICO.new(
-                // bounty.address,// address _bounty,
-                team, // address _team,
-                drx.address, // address _drx,
-                drc.address, // address _drc,
-                _icoSince, // uint256 _icoSince,
-                inFiveMinutes // uint256 _icoTill
-            );
+            return ICO.new(
+                accounts[7],// _etherHolder,
+                drc.address, // _drc,
+                drx.address, // _drx,
+                accounts[6],// _team,
+                _icoSince,// _startTime,
+                inFiveMinutes, //_endTime,
+                new BigNumber('57000000').mul(precision)
+            )
         })
         .then((_result) => ico = _result)
         .then(() => drx.addMinter(ico.address))
