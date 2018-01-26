@@ -56,8 +56,8 @@ contract MintingERC20 is ERC20 {
             return uint256(0);
         }
 
-        initialSupply += _amount;
-        balances[_addr] += _amount;
+        initialSupply = initialSupply.add(_amount);
+        balances[_addr] = balances[_addr].add(_amount);
         Transfer(address(0), _addr, _amount);
 
         return _amount;

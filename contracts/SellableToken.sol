@@ -4,9 +4,10 @@ pragma solidity 0.4.15;
 import "./DaricoGenesis.sol";
 import "./Darico.sol";
 import "./SafeMath.sol";
+import "./Multivest.sol";
 
 
-contract SellableToken  is Ownable {
+contract SellableToken is Multivest {
     using SafeMath for uint256;
 
     uint256 public constant DRC_DECIMALS = 10 ** 18;
@@ -33,10 +34,8 @@ contract SellableToken  is Ownable {
 
     // address where funds are collected
     address public etherHolder;
-    address public team;
 
     bool public finished = false;
-    uint8 public salePeriod;
 
     struct Tier {
         uint256 maxAmount;
@@ -47,26 +46,23 @@ contract SellableToken  is Ownable {
     Tier[] public tiers;
 
     event Contribution(address _holder, uint256 valueETH, uint256 valueDRC, uint256 valueDRX);
-    event  Minted(address indexed to, uint256 valueDRC, uint256 valueDRX);
+    event Minted(address indexed to, uint256 valueDRC, uint256 valueDRX);
 
     function SellableToken(
+        address _multivestAddress,
         address _etherHolder,
         address _drc,
         address _drx,
-        address _team,
         uint256 _startTime,
         uint256 _endTime,
         uint256 _maxTokenSupply
-    )
+    ) Multivest(_multivestAddress)
     {
         require(address(_drc) != address(0));
         drc = Darico(_drc);
 
         require(address(_drx) != address(0));
         drx = DaricoGenesis(_drx);
-
-        require(address(_team) != address(0));
-        team = _team;
 
         require((_startTime < _endTime));
         require(_etherHolder != address(0));
@@ -78,14 +74,12 @@ contract SellableToken  is Ownable {
         maxTokenSupply = _maxTokenSupply;
     }
 
-    function() public payable {
-        bool status = buy(msg.sender, msg.value);
-        require(status == true);
-    }
-
     // @return true if sale period is active
     function isActive() public constant returns (bool) {
         if (maxTokenSupply > uint256(0) && soldDRCTokens == maxTokenSupply) {
+            return false;
+        }
+        if (finished) {
             return false;
         }
         return withinPeriod();
@@ -128,9 +122,6 @@ contract SellableToken  is Ownable {
             if (tier.maxAmount > newSoldTokens) {
                 require(tier.minContribute <= remainingValue);
 
-                uint256 quotient = remainingValue.div(tier.minContribute);
-                require(0 == remainingValue.sub(tier.minContribute.mul(quotient)));
-
                 uint256 amount = remainingValue.mul(DRC_DECIMALS).div(tier.price);
                 if (newSoldTokens.add(amount) > tier.maxAmount) {
                     uint256 diff = tier.maxAmount.sub(newSoldTokens);
@@ -149,27 +140,15 @@ contract SellableToken  is Ownable {
         if (remainingValue > 0) {
             return 0;
         }
-        return newSoldTokens.sub(_soldTokens);
+        uint256 tokensAmount = newSoldTokens.sub(_soldTokens);
+        require(tokensAmount % 1000 == 0);
+
+        return tokensAmount;
     }
 
     function internalFinish() internal {
-        require(false == isActive());
         require(false == finished);
         finished = true;
-        if (salePeriod == 2) {
-            uint256 drcTeam = soldDRCTokens.mul(3).div(10);
-            if ((drcTeam) > 0) {
-                //mint 30% on top for the team
-                uint256 drcMintedAmount = drc.mint(team, drcTeam);
-                require(drcMintedAmount == drcTeam);
-            }
-            uint256 drxTeam = soldDRXTokens.mul(3).div(10);
-            if ((drxTeam) > 0) {
-                // 57M * 3 / 10 = 6 * 3 = 17.1 M
-                uint256 drxMintedAmount = drx.mint(team, drxTeam);
-                require(drxMintedAmount == drxTeam);
-            }
-        }
     }
 
     function buy(address _address, uint256 _value) internal returns (bool) {

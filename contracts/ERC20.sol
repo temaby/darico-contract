@@ -121,7 +121,7 @@ contract ERC20 is Ownable {
         bool _success = transferInternal(_from, _to, _value);
 
         if (_success) {
-            allowed[_from][msg.sender] -= _value;
+            allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         }
 
         return _success;

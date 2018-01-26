@@ -10,9 +10,10 @@ contract TestDaricoGenesisToken is DaricoGenesis {
     uint256 _emitSince,
     bool _initEmission,
     uint256 _initialSupply,
-    address _drc
+    address _drc,
+    address _team
     )
-    DaricoGenesis(_emitSince, _initEmission, _initialSupply, _drc)
+    DaricoGenesis(_emitSince, _initEmission, _initialSupply, _drc, _team)
     {
 //        standard = "Test Genesis Token 0.1";
 

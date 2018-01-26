@@ -131,18 +131,18 @@ contract GenesisToken is MintingERC20 {
                         emission.blockDuration, emission.blockTokens,
                         _totalSupply);
 
-                    totalTokens += collectedTokensPerPeriod;
+                    totalTokens = totalTokens.add(collectedTokensPerPeriod);
 
-                    newCurrentTime += diff;
-                    remainingSeconds -= diff;
+                    newCurrentTime = newCurrentTime.add(diff);
+                    remainingSeconds = remainingSeconds.sub(diff);
                 } else {
                     collectedTokensPerPeriod = getPeriodMinedTokens(remainingSeconds, _currentBalance,
                         emission.blockDuration, emission.blockTokens,
                         _totalSupply);
 
-                    totalTokens += collectedTokensPerPeriod;
+                    totalTokens = totalTokens.add(collectedTokensPerPeriod);
 
-                    newCurrentTime += remainingSeconds;
+                    newCurrentTime = newCurrentTime.add(remainingSeconds);
                     remainingSeconds = 0;
                 }
 

@@ -11,6 +11,9 @@ contract DaricoGenesis is GenesisToken {
 
     uint256 public  maxSupply = uint256(78).mul(10 ** 3).mul(uint(10) ** decimals);
     uint256 public createdAt;
+    address public team;
+
+    bool public sentToTeam;
 
     mapping (address => address) public beneficiaries;
 
@@ -21,10 +24,11 @@ contract DaricoGenesis is GenesisToken {
     // Functions
 
     function DaricoGenesis(
-        uint256 _emitSince,
-        bool _initEmission,
-        uint256 _initialSupply,
-        address _drc
+        uint256 _emitSince, //
+        bool _initEmission, // true
+        uint256 _initialSupply, //0
+        address _drc,   //
+        address _team  //
     )
     GenesisToken(_initialSupply, 0, "Darico Genesis", "DRX", true, false, _emitSince, maxSupply)
     {
@@ -32,6 +36,8 @@ contract DaricoGenesis is GenesisToken {
     
         createdAt = block.timestamp;
         drc = Darico(_drc);
+        require(_team != address(0));
+        team = _team;
 
         // emissions
 
@@ -41,6 +47,12 @@ contract DaricoGenesis is GenesisToken {
             emissions.push(TokenEmission(15, 2.485017123 * 10 ** 18, 1893455999, false));
             emissions.push(TokenEmission(15, 1.242508562 * 10 ** 18, 2082758399, false));
         }
+    }
+
+    function sendTeamTokens() public onlyOwner {
+        require(sentToTeam == false);
+        require(mint(team, 18000) == 18000);
+        sentToTeam = true;
     }
 
     function setDarico(address _tokenAddress) public onlyOwner {
@@ -80,7 +92,7 @@ contract DaricoGenesis is GenesisToken {
         return minted;
     }
 
-    function calculateEmissionTokensForNow(address _address) public returns (uint256 tokens) {
+    function calculateEmissionTokensForNow(address _address) public constant returns (uint256 tokens) {
         if (block.timestamp < emitTokensSince) {
             return 0;
         }
