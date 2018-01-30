@@ -9,7 +9,10 @@
     "solhint": "^1.1.7",
     "solidity-coverage": "^0.2.7"
   },
-  "dependencies": {},
+  "dependencies": {
+    "truffle": "^3.4.11",
+    "truffle-hdwallet-provider": "0.0.3"
+  },
   "scripts": {
     "precommit": "npm run lint && npm run test && npm run coverage",
     "pretest": "node ./node_modules/ethereumjs-testrpc/build/cli.node.js > /dev/null 2>&1 &",

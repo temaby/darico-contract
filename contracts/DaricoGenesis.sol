@@ -33,7 +33,7 @@ contract DaricoGenesis is GenesisToken {
     GenesisToken(_initialSupply, 0, "Darico Genesis", "DRX", true, false, _emitSince, maxSupply)
     {
         standard = "Darico Genesis 0.1";
-    
+
         createdAt = block.timestamp;
         drc = Darico(_drc);
         require(_team != address(0));
@@ -116,7 +116,7 @@ contract DaricoGenesis is GenesisToken {
             uint256 mintedAmount = drc.mint(getBeneficiary(_holder), _tokens);
             require(mintedAmount == _tokens);
         }
-    
+
         ClaimedTokens(_holder, _since, _till, _tokens);
     }
 }

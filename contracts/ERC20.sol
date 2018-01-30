@@ -76,7 +76,7 @@ contract ERC20 is Ownable {
 
     function transfer(address _to, uint256 _value) public onlyPayloadSize(2) returns (bool) {
         require(locked == false);
-    
+
         bool status = transferInternal(msg.sender, _to, _value);
 
         require(status == true);

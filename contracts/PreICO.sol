@@ -70,4 +70,3 @@ contract PreICO is SellableToken {
     }
 
 }
-

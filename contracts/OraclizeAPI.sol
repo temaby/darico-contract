@@ -1,3 +1,5 @@
+pragma solidity 0.4.15;//please import oraclizeAPI_pre0.4.sol when solidity < 0.4.0
+
 // <ORACLIZE_API>
 /*
 Copyright (c) 2015-2016 Oraclize SRL
@@ -28,8 +30,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 /* solhint-disable */
-
-pragma solidity 0.4.15;//please import oraclizeAPI_pre0.4.sol when solidity < 0.4.0
 
 contract OraclizeI {
     address public cbAddress;

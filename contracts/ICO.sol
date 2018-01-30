@@ -8,7 +8,7 @@ import "./OraclizeAPI.sol";
 
 contract ICO is SellableToken, usingOraclize {
 
-    uint256 public constant MIN_CONTRIBUTION = 10;
+    uint256 public constant MIN_CONTRIBUTION = 10; // USD
     PreICO public preIco;
 
     uint256 public priceUpdateAt;
@@ -24,6 +24,8 @@ contract ICO is SellableToken, usingOraclize {
 
     event NewOraclizeQuery(string _description);
     event NewDaricoPriceTicker(string _price);
+
+    event BonusSent(address _address, uint256 _drcTokensAmount, uint256 _drxTokensAmount);
 
     modifier onlyPreICO() {
         require(msg.sender == address(preIco));
@@ -114,11 +116,11 @@ contract ICO is SellableToken, usingOraclize {
         NewDaricoPriceTicker(_price);
     }
 
-    function calculateEthersWithBonus(uint256 _amount, uint256 _time) public constant returns (uint256) {
-        uint256 etherAmount = _amount;
+    function calculateEthersBonusAmount(uint256 _amount, uint256 _time) public constant returns (uint256) {
+        uint256 etherAmount = 0;
         for (uint8 i = 0; i < bonuses.length; i++) {
             if (bonuses[i].startTime <= _time && (bonuses[i].endTime == 0 || bonuses[i].endTime >= _time)) {
-                etherAmount = _amount.add(_amount.mul(bonuses[i].bonus).div(100));
+                etherAmount = _amount.mul(bonuses[i].bonus).div(100);
                 break;
             }
         }
@@ -126,16 +128,17 @@ contract ICO is SellableToken, usingOraclize {
     }
 
     function getTokensAmount(uint256 _value, uint256) public returns (uint256) {
-        uint256 tokensAmount = calculateTokensAmount(_value);
+        require(_value > 0 && (_value >= uint256(10 ** 23).mul(MIN_CONTRIBUTION).div(etherPriceInUSD)));
+        uint256 tokensAmount = _value.mul(etherPriceInUSD).div(10 ** 5);
         require(tokensAmount > 0);
         return tokensAmount;
     }
 
-    function calculateTokensAmount(uint256 _value) public constant returns (uint256) {
-        if (_value == 0 || (_value < uint256(10 ** 23).div(etherPriceInUSD).mul(MIN_CONTRIBUTION))) {
+    function calculateBonusTokensAmount(uint256 _value) public constant returns (uint256) {
+        if (_value == 0 || (_value < uint256(10 ** 23).mul(MIN_CONTRIBUTION).div(etherPriceInUSD))) {
             return 0;
         }
-        return calculateEthersWithBonus(_value, block.timestamp).mul(etherPriceInUSD).div(10**5);
+        return calculateEthersBonusAmount(_value, block.timestamp).mul(etherPriceInUSD).div(10**5);
     }
 
     function increaseTiersMaxAmount(uint256 conjunction) public onlyPreICO {
@@ -154,6 +157,18 @@ contract ICO is SellableToken, usingOraclize {
             NewDaricoPriceTicker(_result);
         }
 
+    }
+
+    function buy(address _address, uint256 _value) internal returns (bool) {
+        uint256 bonusAmount = calculateBonusTokensAmount(_value);
+        if (bonusAmount > 0) {
+            uint256 mintedDrcAmount;
+            uint256 mintedDrxAmount;
+            (mintedDrcAmount, mintedDrxAmount) = mintInternal(_address, bonusAmount);
+            require(bonusAmount == mintedDrcAmount);
+            BonusSent(_address, mintedDrcAmount, mintedDrxAmount);
+        }
+        return super.buy(_address, _value);
     }
 
     function update() internal {
