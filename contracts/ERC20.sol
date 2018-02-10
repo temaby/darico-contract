@@ -1,4 +1,4 @@
-pragma solidity 0.4.15;
+pragma solidity ^0.4.15;
 
 import "./Ownable.sol";
 import "./SafeMath.sol";
@@ -109,7 +109,7 @@ contract ERC20 is Ownable {
         }
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) public onlyPayloadSize(3) returns (bool success) {
+    function transferFrom(address _from, address _to, uint256 _value) public onlyPayloadSize(3) returns (bool success){
         if (locked) {
             return false;
         }

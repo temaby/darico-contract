@@ -1,4 +1,4 @@
-pragma solidity 0.4.15;//please import oraclizeAPI_pre0.4.sol when solidity < 0.4.0
+pragma solidity ^0.4.15;//please import oraclizeAPI_pre0.4.sol when solidity < 0.4.0
 
 // <ORACLIZE_API>
 /*

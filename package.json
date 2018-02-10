@@ -7,14 +7,11 @@
     "ethereumjs-testrpc": "^4.1.3",
     "husky": "^0.14.3",
     "solhint": "^1.1.7",
-    "solidity-coverage": "^0.2.7"
-  },
-  "dependencies": {
-    "truffle": "^3.4.11",
-    "truffle-hdwallet-provider": "0.0.3"
+    "solidity-coverage": "^0.2.7",
+    "truffle-wallet-provider": "0.0.5",
+    "ethereumjs-wallet": "^0.6.0"
   },
   "scripts": {
-    "precommit": "npm run lint && npm run test && npm run coverage",
     "pretest": "node ./node_modules/ethereumjs-testrpc/build/cli.node.js > /dev/null 2>&1 &",
     "test": "truffle test",
     "posttest": "ps | grep ethereumjs-testrpc | grep -v grep | awk '{print $1}' | xargs -J % kill %",
@@ -25,5 +22,8 @@
     "globals": [
       "web3"
     ]
+  },
+  "dependencies": {
+    "truffle": "^4.0.6"
   }
 }

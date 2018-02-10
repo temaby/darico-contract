@@ -1,4 +1,4 @@
-pragma solidity 0.4.15;
+pragma solidity ^0.4.15;
 
 import "./MintingERC20.sol";
 
@@ -30,7 +30,7 @@ contract Darico is MintingERC20 {
 
     function sendTeamTokens() public onlyOwner {
         require(sentToTeam == false);
-        require(mint(team, uint256(18000000).mul(uint(10) ** decimals)) == uint256(18000000).mul(uint(10) ** decimals));
+        require(mint(team, uint256(18000000).mul(uint(10)**decimals)) == uint256(18000000).mul(uint(10)**decimals));
         sentToTeam = true;
     }
 }
