@@ -1,9 +1,11 @@
 const Web3 = require("web3");
+require('dotenv').config();
+
 const web3 = new Web3();
 const WalletProvider = require("truffle-wallet-provider");
 const Wallet = require('ethereumjs-wallet');
 
-var ropstenPrivateKey = new Buffer("d456227c055d812ddb95691e7d1f1197e2f850c119da3f483b471894f3651fa5", "hex");
+var ropstenPrivateKey = new Buffer(process.env["ROPSTEN_PRIVATE_KEY"].toString(), "hex");
 var ropstenWallet = Wallet.fromPrivateKey(ropstenPrivateKey);
 var ropstenProvider = new WalletProvider(ropstenWallet, "https://ropsten.infura.io/");
 
